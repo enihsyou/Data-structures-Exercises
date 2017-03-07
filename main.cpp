@@ -62,7 +62,7 @@ class LinkedList {
     }
 
     Node<T> *next_item = start;
-    int count = 1;
+    auto count = 1;
     while (count < i) { //&& next_item->next != nullptr) {
       next_item = next_item->getNext_node();
       count++;
@@ -101,7 +101,7 @@ class LinkedList {
     }
 
     Node<T> *next_item = start;
-    int count = 1;
+    auto count = 1;
     while (count < i) { //&& next_item->next != nullptr) {
       next_item = next_item->getNext_node();
       count++;
@@ -132,7 +132,7 @@ class LinkedList {
   /*search for key from head to tail, return the first occurrence*/
   int where(const int key) {
     Node<T> *next = start;
-    int count = 0;
+    auto count = 0;
     while (next != nullptr && next->getData() != key) {
       next = next->getNext_node();
       count++;
@@ -145,10 +145,11 @@ class LinkedList {
     if (N < 2) return;
     Node<T> *new_start = moveTo(N - 1);
     Node<T> *now_item = new_start;
-    for (int i = N - 2; i > 0; ++i) {
+    for (auto i = N - 2; i >= 0; --i) {
       now_item->setNext_node(moveTo(i));
+      now_item = now_item->getNext_node();
     }
-
+    now_item->setNext_node();
     start = new_start;
   }
 
@@ -160,13 +161,14 @@ class LinkedList {
   int N;
   Node<T> *start;
 
-  /*return a pointer, which point to the i-th item, including 0*/
+  /*return a pointer, which point to the i-th item, [0, N)*/
   Node<T> *moveTo(const int index) {
     if (index < 0 || index >= N)return nullptr;
     Node<T> *pointer = start;
     int counter = 0;
-    while (counter < index && pointer->getNext_node() != nullptr) {
+    while (counter < index) {
       pointer = pointer->getNext_node();
+      counter++;
     }
     return pointer;
   }
@@ -204,5 +206,8 @@ int main() {
   /*Search for number 98*/
   std::cout << list.where(98) << std::endl;
 
+  /*Inplace reverse*/
+  list.reverse();
+  list.print();
   return 0;
 }
