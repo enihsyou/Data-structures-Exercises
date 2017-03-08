@@ -1,5 +1,5 @@
 #include <iostream>
-
+#include <numeric>
 //struct Node {
 //  int data;
 //  Node *next;
@@ -38,6 +38,34 @@ class LinkedList {
   LinkedList() : LinkedList(0) {}
 
   LinkedList(const int size) : N{size}, start{nullptr} {}
+
+  LinkedList(const LinkedList<T> &a, const LinkedList<T> &b, const bool ascending= true) {
+    int N1 = a.size(), N2 = b.size();
+    Node<T>* p1, p2;
+    while (N1 > 0 && N2 > 0) {
+      p1 = a.moveTo(N1);
+      p2 = b.moveTo(N2);
+      if (ascending);
+
+    }
+  }
+
+  Node<T> *getStart() const {
+    return start;
+  }
+
+  /*Deep copy*/
+  LinkedList(const LinkedList &a) {
+    start = a.getStart();
+    N = a.size();
+
+    Node *now_item = a.getStart();
+    Node *pointer = start;
+    while (now_item->getNext_node() != nullptr) {
+      auto new_node = new Node(&now_item);
+      pointer->setNext_node(new_node);
+    }
+  }
 
   bool insert(const T data) {
     Node<T> *new_start = new Node<T>(data, start);
@@ -154,7 +182,14 @@ class LinkedList {
   }
 
   ~LinkedList() {
+    auto queue = start;
+    Node<T> *memory;
 
+    while (queue->getNext_node() != nullptr) {
+      memory = queue;
+      queue = queue->getNext_node();
+      delete memory;
+    }
   }
 
  private:
@@ -162,7 +197,7 @@ class LinkedList {
   Node<T> *start;
 
   /*return a pointer, which point to the i-th item, [0, N)*/
-  Node<T> *moveTo(const int index) {
+  Node<T> *moveTo(const int index) const{
     if (index < 0 || index >= N)return nullptr;
     Node<T> *pointer = start;
     int counter = 0;
