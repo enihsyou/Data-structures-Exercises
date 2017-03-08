@@ -1,5 +1,6 @@
 #include <iostream>
 #include <numeric>
+
 //struct Node {
 //  int data;
 //  Node *next;
@@ -31,6 +32,10 @@ class Node {
   void setNext_node(Node<T> *next_node = nullptr) {
     Node<T>::next_node = next_node;
   }
+
+  bool operator<(Node<T> &a) {
+    return this->getData() < a.getData();
+  }
 };
 template<class T>
 class LinkedList {
@@ -39,14 +44,31 @@ class LinkedList {
 
   LinkedList(const int size) : N{size}, start{nullptr} {}
 
-  LinkedList(const LinkedList<T> &a, const LinkedList<T> &b, const bool ascending= true) {
-    int N1 = a.size(), N2 = b.size();
-    Node<T>* p1, p2;
-    while (N1 > 0 && N2 > 0) {
+  /*Assume a & b is in ascending order, merge a & b into this, in descending order*/
+  LinkedList(const LinkedList<T> &a, const LinkedList<T> &b) {
+    int N1 = 0, N2 = 0;
+    Node<T> *p1, *p2;
+    while (N1 < a.size() && N2 < b.size()) {
       p1 = a.moveTo(N1);
       p2 = b.moveTo(N2);
-      if (ascending);
 
+      if (*p1 < *p2) {
+        insert(p1->getData());
+        N1++;
+      } else {
+        insert(p2->getData());
+        N2++;
+      }
+    }
+    while (N1 < a.size()) {
+      p1 = a.moveTo(N1);
+      insert(p1->getData());
+      N1++;
+    }
+    while (N2 < b.size()) {
+      p2 = b.moveTo(N2);
+      insert(p2->getData());
+      N2++;
     }
   }
 
@@ -55,14 +77,14 @@ class LinkedList {
   }
 
   /*Deep copy*/
-  LinkedList(const LinkedList &a) {
+  LinkedList(const LinkedList<T> &a) {
     start = a.getStart();
     N = a.size();
 
-    Node *now_item = a.getStart();
-    Node *pointer = start;
+    Node<T> *now_item = a.getStart();
+    Node<T> *pointer = start;
     while (now_item->getNext_node() != nullptr) {
-      auto new_node = new Node(&now_item);
+      auto new_node = new Node<T>(now_item->getData());
       pointer->setNext_node(new_node);
     }
   }
@@ -197,7 +219,7 @@ class LinkedList {
   Node<T> *start;
 
   /*return a pointer, which point to the i-th item, [0, N)*/
-  Node<T> *moveTo(const int index) const{
+  Node<T> *moveTo(const int index) const {
     if (index < 0 || index >= N)return nullptr;
     Node<T> *pointer = start;
     int counter = 0;
@@ -214,7 +236,7 @@ int main() {
   /*Empty test*/
   list.print();
 
-  /*Insert 9 range integeres*/
+  /*Insert 9 range integers*/
   for (int i = 0; i < 9; ++i) {
     list.insert(i);
   }
@@ -239,10 +261,23 @@ int main() {
   list.print();
 
   /*Search for number 98*/
-  std::cout << list.where(98) << std::endl;
+  std::cout << "number 98 is on " << list.where(98) << std::endl;
 
   /*Inplace reverse*/
   list.reverse();
   list.print();
+
+  /*merge to list*/
+  LinkedList<int> one = LinkedList<int>();
+  LinkedList<int> two = LinkedList<int>();
+  for (int j = 9; j > 6; --j) {
+    one.insert(j);
+  }
+  for (int k = 4; k > 1; --k) {
+    two.insert(k);
+  }
+  LinkedList<int> three = LinkedList<int>(one, two);
+  three.print();
+
   return 0;
 }
