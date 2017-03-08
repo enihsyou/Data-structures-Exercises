@@ -11,9 +11,9 @@ class Node {
   T data;
   Node<T> *next_node;
  public:
-  Node() {}
+  Node() : next_node{nullptr} {}
 
-  Node(T init) : data{init} {}
+  Node(T init) : data{init}, next_node{nullptr} {}
 
   Node(T init, Node<T> *next) : data{init}, next_node{next} {}
 
@@ -45,7 +45,7 @@ class LinkedList {
   LinkedList(const int size) : N{size}, start{nullptr} {}
 
   /*Assume a & b is in ascending order, merge a & b into this, in descending order*/
-  LinkedList(const LinkedList<T> &a, const LinkedList<T> &b) {
+  LinkedList(const LinkedList<T> &a, const LinkedList<T> &b) : LinkedList() {
     int N1 = 0, N2 = 0;
     Node<T> *p1, *p2;
     while (N1 < a.size() && N2 < b.size()) {
