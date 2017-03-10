@@ -1,136 +1,139 @@
 #include <iostream>
+#include "../include/sequential_list.h"
 #include "../include/linked_list.h"
-
-template<class T>
-class SequentialList {
- private:
-  int size;
-  int capacity;
-  T *list;
-
-  void resize(int new_size) {
-    T *new_location = new T[new_size];
-    T *pointer = list;
-    for (int i = 0; i < size; ++i) {
-      *new_location = *list;
-    }
-    delete list;
-    list = pointer;
-    capacity = new_size;
-  }
-
-  void offset(int start, int end, int offset = 1) {
-    if (size + offset > capacity)resize(2 * capacity);
-    for (int i = end; i > start; --i) {
-      list[i] = list[i - 1];
-    }
-  }
-
-  int search(T data, int lo, int hi) {
-    if (lo > hi) return -1;
-    int mid = (lo + hi) / 2;
-    if (list[mid] > data) search(data, lo, mid - 1);
-    else if (list[mid] < data) search(data, mid + 1, hi);
-    else return mid;
-  }
-
- public:
-  SequentialList() : size{0}, capacity{0}, list{nullptr} {}
-
-  SequentialList(const int capacity) : size{0}, capacity(capacity) {}
-
-  SequentialList(const int size, const int capacity, T *list)
-      : size(size), capacity(capacity), list(list) {}
-
-  bool put(const T data) {
-    if (size >= capacity) resize(2 * capacity);
-    int place = search(data, 0, size);
-    list[size++] = data;
-    return true;
-  }
-
-  bool del(const int index) {
-    if (index < 0 || index > size)return false;
-//    list[size_--] = nullptr;
-    size--;
-  }
-
-  void print() const {
-    std::cout << "List size_: " << size << std::endl;
-    for (int i = 0; i < size; ++i) {
-      std::cout << list[i] << " ";
-    }
-    std::cout << std::endl;
-  }
-};
-
 int main() {
-  auto list = linked_list<int>();
+  std::cout << "|||Sequential list demo|||" << std::endl;
+  auto s_list = sequential_list<int>();
   /*Empty test*/
-  list.print();
+  s_list.print();
 
-  /*Insert 9 range integers*/
+  /*Insert range integers*/
   int items_limit;
   std::cout << "Generate number range from 0 to ";
   std::cin >> items_limit;
-  for (int i = 0; i < items_limit; ++i) {
-    list.insert(i);
+  for (auto i = 0; i < items_limit; ++i) {
+    s_list.put(i);
   }
-  list.print();
+  s_list.print();
+
+  /*Manually insert*/
+  std::cout << "Type number to insert (-1 to stop)";
+  std::cin >> items_limit;
+  while (items_limit != -1) {
+    s_list.put(items_limit);
+    s_list.print();
+    std::cin >> items_limit;
+  }
 
   /*Remove the specified item*/
   int index;
   std::cout << "Item place to remove: ";
   std::cin >> index;
-  list.remove(index);
-  list.print();
-
-  /*Insert number to the head*/
-  int number_to_insert;
-  std::cout << "Number inserted to head: ";
-  std::cin >> number_to_insert;
-  list.insert(number_to_insert);
-  list.print();
-
-  /*Remove 3 items from head*/
-  int num;
-  std::cout << "How many items should be removed: ";
-  std::cin >> num;
-  for (auto i = 0; i < num; ++i) {
-    list.remove();
-  }
-  list.print();
-
-  /*Insert number 98 2 items away from tail*/
-  int new_num, offset;
-  std::cout << "Input a number and offset away from tail: ";
-  std::cin >> new_num >> offset;
-  list.insert(new_num, list.size() - offset);
-  list.print();
+  s_list.del(index);
+  s_list.print();
 
   /*Search for number 98*/
   int search_for;
   std::cout << "Search for number: ";
   std::cin >> search_for;
-  std::cout << "number " << search_for << " is on " << list.where(search_for) << std::endl;
+  const int result1 = s_list.search(search_for);
+  if (result1 == -1) {
+    std::cout << "Number " << search_for << " not found" << std::endl;
+  } else {
+    std::cout << "number " << search_for << " is on " << result1 << std::endl;
+  }
+
+  /*Insert item*/
+  int item_to_insert;
+  std::cout << "Item to insert: ";
+  std::cin >> item_to_insert;
+  s_list.put(item_to_insert);
+  s_list.print();
+
+  std::cout << "|||Linked list demo|||" << std::endl;
+
+  auto l_list = linked_list<int>();
+  /*Empty test*/
+  l_list.print();
+
+  /*Insert range integers*/
+  std::cout << "Generate number range from 0 to ";
+  std::cin >> items_limit;
+  for (auto i = items_limit - 1; i >= 0; --i) {
+    l_list.insert(i);
+  }
+  l_list.print();
+
+  /*Manually insert*/
+  std::cout << "Type number to insert (-1 to stop)";
+  std::cin >> items_limit;
+  while (items_limit != -1) {
+    l_list.insert(items_limit);
+    l_list.print();
+  }
+
+  /*Remove the specified item*/
+  std::cout << "Item place to remove: ";
+  std::cin >> index;
+  l_list.remove(index);
+  l_list.print();
+
+  /*Insert number to the head*/
+  int number_to_insert;
+  std::cout << "Number inserted to head: ";
+  std::cin >> number_to_insert;
+  l_list.insert(number_to_insert);
+  l_list.print();
+
+  /*Remove items from head*/
+  int num;
+  std::cout << "How many items should be removed: ";
+  std::cin >> num;
+  for (auto i = 0; i < num; ++i) {
+    l_list.remove();
+  }
+  l_list.print();
+
+  /*Insert number, away from tail*/
+  int new_num, offset;
+  std::cout << "Input a number and offset away from tail: ";
+  std::cin >> new_num >> offset;
+  l_list.insert(new_num, l_list.size() - offset);
+  l_list.print();
+
+  /*Search for number*/
+  std::cout << "Search for number: ";
+  std::cin >> search_for;
+  const int result2 = l_list.where(search_for);
+  if (result2 == -1) {
+    std::cout << "Number " << search_for << " not found" << std::endl;
+  } else {
+    std::cout << "number " << search_for << " is on " << result2 << std::endl;
+  }
 
   /*Inplace reverse*/
   std::cout << "Inplace reverse list" << std::endl;
-  list.reverse();
-  list.print();
+  l_list.reverse();
+  l_list.print();
 
-  /*merge to list*/
+  /*Merge to list*/
   std::cout << "Merge two list" << std::endl;
   linked_list<int> one = linked_list<int>();
   linked_list<int> two = linked_list<int>();
-  for (int j = 9; j > 6; --j) {
+  std::cout << "List one: ";
+  for (int j = 20; j >= 10; j -= 2) {
     one.insert(j);
   }
-  for (int k = 4; k > 1; --k) {
+  one.print();
+  std::cout << "List two: ";
+  for (int k = 17; k >= 7; k -= 2) {
     two.insert(k);
   }
+  two.print();
   linked_list<int> three = linked_list<int>(one, two);
+  std::cout << "List three (from merging): ";
   three.print();
+  std::cout << "List three (reversed): ";
   three.reverse();
   three.print();
 
