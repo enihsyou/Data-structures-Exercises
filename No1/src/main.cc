@@ -65,12 +65,17 @@ int main() {
   l_list.print();
 
   /*Manually insert*/
-  std::cout << "Type number to insert (-1 to stop)";
+  std::cout << "Type number to insert (-1 to stop): ";
   std::cin >> items_limit;
   while (items_limit != -1) {
     l_list.insert(items_limit);
     l_list.print();
+    std::cin >> items_limit;
   }
+  std::cout << "Specified lower bound and uper bound to remove: ";
+  std::cin >> index >> items_limit;
+  l_list.remove(index, items_limit);
+  l_list.print();
 
   /*Remove the specified item*/
   std::cout << "Item place to remove: ";
