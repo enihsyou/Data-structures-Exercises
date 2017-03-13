@@ -15,6 +15,7 @@ class linked_list {
   linked_list(const linked_list<T> &a);
   /*Assuming that a & b are in ascending order, merge a & b into this, in descending order*/
   linked_list(const linked_list<T> &a, const linked_list<T> &b);
+  linked_list(linked_list<T> &a, linked_list<T> &b);
   bool insert(const T data);
   /*
  * Insert item into the i-th place, start_ from 0
@@ -86,6 +87,37 @@ linked_list<T>::linked_list(const linked_list<T> &a, const linked_list<T> &b)
     p2 = b.moveTo(N2);
     insert(p2->data());
     N2++;
+  }
+}
+template<class T>
+linked_list<T>::linked_list(linked_list<T> &a, linked_list<T> &b)
+    : size_(a.size() + b.size()), start_(nullptr) {
+  node<T> *p1 = a.start(), *p2 = b.start();
+  node<T> *tmp_ptr;
+  while (p1 && p2) {
+    if (*p1 < *p2) {
+      tmp_ptr = p1->next_node();
+      p1->set_next_node(start_);
+      start_ = p1;
+      p1 = tmp_ptr;
+    } else {
+      tmp_ptr = p2->next_node();
+      p2->set_next_node(start());
+      start_ = p2;
+      p2 = tmp_ptr;
+    }
+  }
+  while (p1) {
+    tmp_ptr = p1->next_node();
+    p1->set_next_node(start_);
+    start_ = p1;
+    p1 = tmp_ptr;
+  }
+  while (p2) {
+    tmp_ptr = p2->next_node();
+    p2->set_next_node(start_);
+    start_ = p2;
+    p2 = tmp_ptr;
   }
 }
 template<class T>
