@@ -10,7 +10,6 @@ class sequential_list {
  public:
   sequential_list(const int capacity = 0) : size_(0), capacity_(capacity), list_(nullptr) {}
   bool put(const T data);
-  bool put(const T data, const int where);
   bool del(const int index);
   /*Return one of data's index*/
   int search(const T data);
@@ -18,6 +17,7 @@ class sequential_list {
   inline int size() const { return size_; }
   inline int capacity() const { return capacity_; }
   virtual ~sequential_list();
+
  private:
   int size_;
   int capacity_;
@@ -25,6 +25,7 @@ class sequential_list {
 
   void resize(const int new_size);
   void offset(const int start, const int end, const int offset = 1);
+  bool put(const T data, const int where);
   int search(const T data, const int lo, const int hi);
   int insert_place(const T target);
 };
@@ -68,9 +69,11 @@ template<class T>
 int sequential_list<T>::search(const T data, const int lo, const int hi) {
   if (lo > hi) return -1;
   int mid = (lo + hi) / 2;
-  if (list_[mid] > data) { return search(data, lo, mid - 1); }
-  else if (list_[mid] < data) { return search(data, mid + 1, hi); }
-  else { return mid; }
+  if (list_[mid] > data) {
+    return search(data, lo, mid - 1);
+  } else if (list_[mid] < data) {
+    return search(data, mid + 1, hi);
+  } else { return mid; }
 }
 template<class T>
 int sequential_list<T>::insert_place(const T target) {
@@ -88,7 +91,6 @@ int sequential_list<T>::insert_place(const T target) {
   }
   while (start < size() && list_[start] < target) start++;
   return start;
-
 }
 template<class T>
 bool sequential_list<T>::del(const int index) {

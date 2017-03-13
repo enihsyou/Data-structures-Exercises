@@ -26,6 +26,7 @@ class linked_list {
  * */
   bool insert(const T data, const int where);
   bool remove();
+  bool remove(const node<T> &mink, const node<T> &maxk);
   /*
   * remove the i-th item, count start_ from 0
   *  |o|o|o|o|
@@ -73,7 +74,8 @@ linked_list<T>::linked_list(const linked_list<T> &a, const linked_list<T> &b)
     if (*p1 < *p2) {
       insert(p1->data());
       N1++;
-    } else {
+    }
+    else {
       insert(p2->data());
       N2++;
     }
@@ -237,6 +239,21 @@ node<T> *linked_list<T>::moveTo(const int index) const {
     counter++;
   }
   return pointer;
+}
+template<class T>
+bool linked_list<T>::remove(const node<T> &mink, const node<T> &maxk) {
+  auto ptr = start_;
+  while (ptr->next_node() && *(ptr->next_node()) < const_cast<node<T> &>(mink)) {
+    ptr = ptr->next_node();
+  }
+  auto ptr_e = ptr;
+  auto count = 0;
+  while (ptr_e->next_node() && *(ptr_e->next_node()) < const_cast<node<T> &>(maxk)) {
+    ptr_e = ptr_e->next_node();
+    count++;
+  }
+  ptr->set_next_node(ptr_e->next_node());
+  size_ -= count;
 }
 
 #endif //NO1_LINKED_LIST_H
