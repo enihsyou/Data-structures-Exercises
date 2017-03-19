@@ -10,11 +10,12 @@ class node {
   node() : next_node_(nullptr) {}
   node(T init) : node(init, nullptr) {}
   node(T init, node<T> *next) : data_(init), next_node_(next) {};
-  inline T data() const { return data_; }
+  T data() const { return data_; }
   void set_data(T data) { data_ = data; }
-  inline node *next_node() const { return next_node_; }
+  node *next_node() const { return next_node_; }
   void set_next_node(node *next_node) { next_node_ = next_node; }
-  bool operator<(node<T> &a) { return data() < a.data(); }
+  bool operator<(node<T> &a) { return data_ < a.data_; }
+  bool operator>(node<T> &a) { return data_ > a.data_; }
   virtual ~node() {}
  private:
   T data_;
