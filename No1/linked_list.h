@@ -13,7 +13,7 @@ public:
   linked_list() : size_(0), start_(nullptr) {}
   linked_list(const linked_list<T>& a);
   linked_list(linked_list<T>& a, linked_list<T>& b);
-
+  virtual ~linked_list();
   int insert(const T data);
   void remove(const int where);
   void remove(const T mink, const T maxk);
@@ -80,7 +80,6 @@ linked_list<T>::linked_list(linked_list<T>& a, linked_list<T>& b)
     p2 = p2->next_node();
     start_->set_next_node(old);
   }
-
 }
 
 /**
@@ -114,7 +113,7 @@ int linked_list<T>::insert(const T data) {
  *  |o|o|o|o|
  *   ^ ^ ^ ^
  *   0 1 2 3
- * \return 
+ * \return
  */
 template <class T>
 void linked_list<T>::remove(const int where) {
@@ -203,5 +202,13 @@ void linked_list<T>::print() const {
     next = next->next_node();
   }
   std::cout << std::endl;
+}
+template<class T>
+linked_list::~linked_list() {
+  while (start_){
+    auto old_node = start_;
+    delete start_;
+    start_ = old_node;
+  }
 }
 #endif //NO1_LINKED_LIST_H
