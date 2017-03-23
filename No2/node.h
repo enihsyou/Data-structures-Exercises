@@ -15,6 +15,7 @@ class node {
   node *next_node() const { return next_node_; }
   void set_next_node(node *next_node) { next_node_ = next_node; }
   bool operator<(node<T> &a) { return data_ < a.data_; }
+  bool operator==(node<T> &a) { return data_ == a.data_; }
   bool operator>(node<T> &a) { return data_ > a.data_; }
   virtual ~node() {}
  private:
