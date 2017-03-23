@@ -19,8 +19,23 @@ public:
 
   virtual ~Queue() { delete[] datum_; }
 
+  /**
+   * \brief 插入一个元素到队列中
+   * \exception std::overflow_error 队列已满
+   * \param data 入队元素内容
+   */
   void Enqueue(const T data);
+  /**
+   * \brief 移出队列头上的元素
+   * \exception std::underflow_error 队列为空
+   * \return 队列首部元素
+   */
   T Dequeue();
+  /**
+   * \brief 查看队列头上的元素
+   * \exception std::underflow_error 队列为空
+   * \return 队列首部元素
+   */
   T Peek() const;
 
   bool EmptyQ() const { return rear_ < 0; }
@@ -32,15 +47,15 @@ public:
   friend std::ostream& operator<<(std::ostream& os, const Queue& obj) {
     auto size = obj.Size();
     os << "Size: " << size;
-    if (size > 0) os << "\nDatum: " << std::endl;
+    if (size > 0) os << "\nDatum: " << std::endl; // 非空队列继续操作
     else return os;
 
     int ptr = obj.front_;
-    while (ptr % obj.capacity_ != obj.rear_) {
+    while (ptr % obj.capacity_ != obj.rear_) { // 打印中间元素
       os << obj.datum_[ptr] << " ";
       ptr++;
     }
-    return os << obj.datum_[ptr] << std::endl;
+    return os << obj.datum_[ptr] << std::endl; // 打印最后一个元素
   }
 
 private:
@@ -62,7 +77,7 @@ T Queue<T>::Dequeue() {
   if (EmptyQ()) throw std::underflow_error("队列为空"); // Empty
   T data = datum_[front_];
   front_ = (front_ + 1) % capacity_;
-  if (front_ == rear_) { rear_ = -1; }
+  if (front_ == rear_) { rear_ = -1; } // 移除最后一个剩余元素
   return data;
 }
 

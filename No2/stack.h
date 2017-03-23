@@ -11,9 +11,21 @@ template <class T>
 class Stack {
 public:
   Stack() : first_{nullptr}, size_{0} {}
-  void Push(const T data);
   virtual ~Stack();
+  /**
+   * \brief 入栈，元素插入到链表头部
+   * \param data 插入的数据
+   */
+  void Push(const T data);
+  /**
+   * \brief 弹栈，移除栈顶元素并返回
+   * \return 弹出的栈顶的元素内容
+   */
   T Pop();
+  /**
+   * \brief 查看栈顶元素内容，但不弹出
+   * \return 栈顶元素
+   */
   T Peek() const;
 
   int size() const { return size_; }
@@ -21,7 +33,11 @@ public:
   bool EmptyQ() const { return first_ == nullptr; };
 
   friend std::ostream& operator<<(std::ostream& os, const Stack& obj) {
-    os << "Size: " << obj.size() << "\nDatum: " << std::endl;
+    auto size = obj.size(); 
+    os << "Size: " << size;
+    if (size > 0) os << "\nDatum: " << std::endl; // 非空栈继续操作
+    else return os;
+
     node<T>* ptr = obj.first_;
     while (ptr) {
       os << ptr->data() << "\n";
