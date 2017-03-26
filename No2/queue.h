@@ -13,6 +13,7 @@ class Queue {
 public:
   /**
    * \brief 初始化循环队列，front_和rear_两个数字指示数据位置，负数(-1)代表不可用
+   * 实现capacity容量的充分利用。
    * \param capacity 最大队列容量，输入非正数会初始化1大小队列
    */
   explicit Queue(int const capacity) : capacity_{capacity > 0 ? capacity : 1}, front_{0}, rear_{-1}, datum_{new T[capacity]} { }
