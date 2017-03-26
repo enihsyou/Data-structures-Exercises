@@ -49,7 +49,7 @@ public:
     auto size = obj.Size();
     os << "Size: " << size;
     if (size > 0) os << "\nDatum: " << std::endl; // 非空队列继续操作
-    else return os;
+    else return os << std::endl;
 
     int ptr = obj.front_;
     while (ptr % obj.capacity_ != obj.rear_) { // 打印中间元素

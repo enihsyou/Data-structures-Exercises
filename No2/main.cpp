@@ -3,7 +3,6 @@
 #include "queue.h"
 #include <string>
 #include <regex>
-#include <cassert>
 
 void g_Clean_input() {
   std::cin.clear();
@@ -84,16 +83,14 @@ auto Precedence = [](std::string& op)-> int {
   //  throw std::invalid_argument("不支持的操作符");
 
 };
-auto CmpOperator = [](std::string& op1, std::string& op2) -> int {
-  if (op1 == op2) { return 0; }
-  if (Precedence(op1) - Precedence(op2) > 0) { return 1; } else { return -1; }
-};
 auto Evaluate = [](std::string& op, double val1, double val2) -> double {
   if (op == "+")return val1 + val2;
   if (op == "-")return val1 - val2;
   if (op == "*")return val1 * val2;
   if (op == "/")return val1 / val2;
-  if (op == "^")return std::pow(val1, val2);
+  if (op == "^")return pow(val1, val2);
+  if (op == "max")return std::max(val1, val2);
+  if (op == "min")return std::min(val1, val2);
 
   throw std::invalid_argument("不支持的操作符");
 };
@@ -103,7 +100,7 @@ void caculator() {
   std::string input;
   g_Clean_input();
   std::cout << "输入四则运算表达式：";
-  std::regex arithmetic_regex(R"((\d+(?:\.\d*)?)|([\(\)\+\-\*\/\^]))");
+  std::regex arithmetic_regex(R"((\d+(?:\.\d*)?)|(max|min|[\(\)\+\-\*\/\^]))");
   while (std::getline(std::cin, input)) {
     /*Shunting Yard Algorithm*/
     Stack<double> result_stack; // 结果栈
@@ -133,7 +130,7 @@ void caculator() {
       /*RPN Calculator*/
       while (!op_stack.EmptyQ()) result_stack.Push(Evaluate(op_stack.Pop(), result_stack.Pop(), result_stack.Pop()));
       if (!result_stack.EmptyQ()) std::cout << input << " = " << result_stack.Pop() << std::endl;
-    } catch (const std::exception& error) { std::cout << "表达式 " << input << " 有误" << std::endl; }
+    } catch (const std::exception&) { std::cout << "表达式 " << input << " 有误" << std::endl; }
   }
 
 }

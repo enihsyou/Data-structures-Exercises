@@ -36,11 +36,11 @@ public:
     auto size = obj.size(); 
     os << "Size: " << size;
     if (size > 0) os << "\nDatum: " << std::endl; // ·Ç¿ÕÕ»¼ÌÐø²Ù×÷
-    else return os;
+    else return os << std::endl;
 
     node<T>* ptr = obj.first_;
     while (ptr) {
-      os << ptr->data() << "\n";
+      os << ptr->data() << " ";
       ptr = ptr->next_node();
     }
     return os << std::endl;
