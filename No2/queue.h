@@ -41,7 +41,12 @@ public:
 
   bool EmptyQ() const { return rear_ < 0; }
   bool FullQ() const { return rear_ >= 0 && (rear_ + 1) % capacity_ == front_; }
-  int Size() const { return rear_ < 0 ? 0 : (rear_ - front_) % capacity_ + 1; }
+
+  int Size() const {
+    /*Module的操作和语言的实现有关，这句存在Bug*/
+    //return rear_ < 0 ? 0 : (rear_ - front_) % capacity_ + 1; 
+    return rear_ < 0 ? 0 : rear_ < front_ ? rear_ - front_ + capacity_ + 1 : rear_ - front_ + 1;
+  }
 
   int capacity() const { return capacity_; }
 
@@ -53,10 +58,10 @@ public:
 
     int ptr = obj.front_;
     while (ptr % obj.capacity_ != obj.rear_) { // 打印中间元素
-      os << obj.datum_[ptr] << " ";
+      os << obj.datum_[ptr % obj.capacity_] << " ";
       ptr++;
     }
-    return os << obj.datum_[ptr] << std::endl; // 打印最后一个元素
+    return os << obj.datum_[ptr % obj.capacity_] << std::endl; // 打印最后一个元素
   }
 
 private:

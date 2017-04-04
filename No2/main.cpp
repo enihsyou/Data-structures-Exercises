@@ -3,6 +3,7 @@
 #include "queue.h"
 #include <string>
 #include <regex>
+#include <cmath>
 
 void g_Clean_input() {
   std::cin.clear();
@@ -10,7 +11,7 @@ void g_Clean_input() {
   std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 }
 
-void s_func_1(Stack<int>& stack) {
+void s_func_1(Stack<int> &stack) {
   // int specificed
   std::string input;
   g_Clean_input();
@@ -24,13 +25,13 @@ void s_func_1(Stack<int>& stack) {
     if (input == "#") {
       try {
         std::cout << "弹出：" << stack.Pop() << std::endl;
-      } catch (std::underflow_error& error) { std::cout << error.what() << std::endl; }
+      } catch (std::underflow_error &error) { std::cout << error.what() << std::endl; }
     } else if (input == "%") {
       std::cout << stack;
     } else if (input == "@") {
       try {
         std::cout << "栈顶元素：" << stack.Peek() << std::endl;
-      } catch (std::underflow_error& error) { std::cout << error.what() << std::endl; }
+      } catch (std::underflow_error &error) { std::cout << error.what() << std::endl; }
     } else {
       stack.Push(stoi(input));// 字符串转整数
     }
@@ -38,8 +39,7 @@ void s_func_1(Stack<int>& stack) {
   std::cout << stack;
 }
 
-
-void q_init(Queue<int>& queue) {
+void q_init(Queue<int> &queue) {
   // int specificed
   std::string input;
   g_Clean_input();
@@ -53,24 +53,24 @@ void q_init(Queue<int>& queue) {
     if (input == "#") {
       try {
         std::cout << "出队：" << queue.Dequeue() << std::endl;
-      } catch (std::underflow_error& error) { std::cout << error.what() << std::endl; }
+      } catch (std::underflow_error &error) { std::cout << error.what() << std::endl; }
     } else if (input == "%") {
       std::cout << queue;
     } else if (input == "@") {
       try {
         std::cout << "队首元素：" << queue.Peek() << std::endl;
-      } catch (std::underflow_error& error) { std::cout << error.what() << std::endl; }
+      } catch (std::underflow_error &error) { std::cout << error.what() << std::endl; }
     } else {
       try {
         queue.Enqueue(stoi(input)); // 字符串转整数
-      } catch (std::overflow_error& error) { std::cout << error.what() << std::endl; }
+      } catch (std::overflow_error &error) { std::cout << error.what() << std::endl; }
     }
   }
   std::cout << queue;
 }
 
 namespace {
-auto Precedence = [](std::string& op)-> int {
+auto Precedence = [](std::string &op) -> int {
   // 都是二元算符
   if (op == "+")return 2;
   if (op == "-")return 2;
@@ -83,30 +83,29 @@ auto Precedence = [](std::string& op)-> int {
   //  throw std::invalid_argument("不支持的操作符");
 
 };
-auto Evaluate = [](std::string& op, double val1, double val2) -> double {
+auto Evaluate = [](std::string &op, double val1, double val2) -> double {
   if (op == "+")return val1 + val2;
   if (op == "-")return val1 - val2;
   if (op == "*")return val1 * val2;
   if (op == "/")return val1 / val2;
   if (op == "^")return pow(val1, val2);
-  if (op == "max")return std::max(val1, val2);
-  if (op == "min")return std::min(val1, val2);
 
   throw std::invalid_argument("不支持的操作符");
 };
 }
 
-void caculator() {
+void calculator() {
   std::string input;
   g_Clean_input();
   std::cout << "输入四则运算表达式：";
-  std::regex arithmetic_regex(R"((\d+(?:\.\d*)?)|(max|min|[\(\)\+\-\*\/\^]))");
+  std::regex arithmetic_regex(R"((\d+(?:\.\d*)?)|([\(\)\+\-\*\/\^]))");
   while (std::getline(std::cin, input)) {
     /*Shunting Yard Algorithm*/
     Stack<double> result_stack; // 结果栈
     Stack<std::string> op_stack; // 操作符栈
     try {
-      for (auto i = std::sregex_iterator(input.begin(), input.end(), arithmetic_regex); i != std::sregex_iterator(); ++i) {
+      for (auto i = std::sregex_iterator(input.begin(), input.end(), arithmetic_regex);
+           i != std::sregex_iterator(); ++i) {
         auto op = i->str(); // 输入的操作数
 
         if ((*i)[2].length() > 0) { // Operator
@@ -128,9 +127,12 @@ void caculator() {
         }
       }
       /*RPN Calculator*/
-      while (!op_stack.EmptyQ()) result_stack.Push(Evaluate(op_stack.Pop(), result_stack.Pop(), result_stack.Pop()));
+      while (!op_stack.EmptyQ())
+        result_stack.Push(Evaluate(op_stack.Pop(),
+                                   result_stack.Pop(),
+                                   result_stack.Pop()));
       if (!result_stack.EmptyQ()) std::cout << input << " = " << result_stack.Pop() << std::endl;
-    } catch (const std::exception&) { std::cout << "表达式 " << input << " 有误" << std::endl; }
+    } catch (const std::exception &) { std::cout << "表达式 " << input << " 有误" << std::endl; }
   }
 
 }
@@ -141,7 +143,6 @@ int main() {
   Stack<int> stack = Stack<int>();
   s_func_1(stack);
 
-
   std::cout << "|||循环队列的操作|||" << std::endl;
   std::cout << "输入队列大小：";
   g_Clean_input();
@@ -150,6 +151,6 @@ int main() {
   Queue<int> queue = Queue<int>(queue_size);
   q_init(queue);
   std::cout << "|||逆波兰计算器|||" << std::endl;
-  caculator();
+  calculator();
   return 0;
 }
