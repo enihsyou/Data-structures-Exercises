@@ -8,6 +8,7 @@
 #include <stack>
 #include <queue>
 
+
 void TreeNode::preOrderRecursiveTraverse(const std::function<void(const TreeNode &)> &do_on_node) const {
     do_on_node(*this);
     if (left) left->preOrderRecursiveTraverse(do_on_node);
@@ -27,7 +28,7 @@ void TreeNode::postOrderRecursiveTraverse(const std::function<void(const TreeNod
 }
 
 void TreeNode::preOrderIterativeTraverse(const std::function<void(const TreeNode &)> &do_on_node) const {
-    std::stack<const TreeNode*> stack{};
+    std::stack<const TreeNode *> stack{ };
     stack.push(this);
 
     while (!stack.empty()) {
@@ -40,7 +41,7 @@ void TreeNode::preOrderIterativeTraverse(const std::function<void(const TreeNode
 }
 
 void TreeNode::inOrderIterativeTraverse(const std::function<void(const TreeNode &)> &do_on_node) const {
-    std::stack<const TreeNode*> stack{};
+    std::stack<const TreeNode *> stack{ };
     const auto *node = this;
 
     do {
@@ -57,7 +58,7 @@ void TreeNode::inOrderIterativeTraverse(const std::function<void(const TreeNode 
 }
 
 void TreeNode::postOrderIterativeTraverse(const std::function<void(const TreeNode &)> &do_on_node) const {
-    std::stack<const TreeNode*> stack{};
+    std::stack<const TreeNode *> stack{ };
     const auto *node = this;
     const TreeNode *last_visited = nullptr;
 
@@ -79,7 +80,7 @@ void TreeNode::postOrderIterativeTraverse(const std::function<void(const TreeNod
 }
 
 void TreeNode::levelOrderBFSTraverse(const std::function<void(const TreeNode &)> &do_on_node) const {
-    std::queue<const TreeNode*> queue{};
+    std::queue<const TreeNode *> queue{ };
     queue.push(this);
     while (!queue.empty()) {
         auto node = queue.front();
@@ -100,11 +101,9 @@ std::string TreeNode::toString() const {
     return std::to_string(key).append(":").append(std::to_string(value));
 }
 
-
 unsigned size(const TreeNodePtr node) {
     return node ? node->size : 0U;
 }
-
 
 int BinaryTree::get(const int key) const {
     auto node = root_;
@@ -133,27 +132,28 @@ const TreeNode &BinaryTree::put(const int key, const int value) {
 }
 
 AsciiNodePtr AsciiTree::buildTree(const BinaryTree &tree) {
-    root_ = buildTreeRecursice(tree.root());
+    root_ = buildTreeRecursively(tree.root());
     root_->parentDirection = 0;
     return root_;
 }
 
-AsciiNodePtr AsciiTree::buildTreeRecursice(const TreeNodePtr t_node) const {
+AsciiNodePtr AsciiTree::buildTreeRecursively(const TreeNodePtr t_node) const {
     if (!t_node) { return nullptr; }
     auto node = std::make_shared<AsciiNode>();
-    node->left = buildTreeRecursice(t_node->left);
-    node->right = buildTreeRecursice(t_node->right);
+    node->left = buildTreeRecursively(t_node->left);
+    node->right = buildTreeRecursively(t_node->right);
     if (node->left) { node->left->parentDirection = -1; }
     if (node->right) { node->right->parentDirection = 1; }
     node->label = t_node->toString();
-    node->labelLength = node->label.length();
+    node->labelLength = static_cast<int>(node->label.length());
     return node;
 }
 
 void AsciiTree::computeLeftProfile(const AsciiNodePtr t_node, const int x, const int y) {
     if (!t_node) return;
     bool isLeft = t_node->parentDirection == -1;
-    leftProfile_[y] = std::min(leftProfile_[y], x - (t_node->labelLength - isLeft) / 2); // x - len(label)/2 lProfile都是非正数，取最小的 即最远
+    leftProfile_[y] = std::min(leftProfile_[y],
+        x - (t_node->labelLength - isLeft) / 2); // x - len(label)/2 lProfile都是非正数，取最小的 即最远
     if (t_node->left) {
         //如果有左支，对每一层 做相应的扩展
         for (int i = 1; i <= t_node->edgeLength && y + i < MAX_HEIGHT; ++i) {
@@ -169,7 +169,8 @@ void AsciiTree::computeLeftProfile(const AsciiNodePtr t_node, const int x, const
 void AsciiTree::computeRightProfile(const AsciiNodePtr t_node, const int x, const int y) {
     if (!t_node) return;
     bool isRight = t_node->parentDirection == 1;
-    rightProfile_[y] = std::max(rightProfile_[y], x + (t_node->labelLength - isRight) / 2); //rProfile都是放非负数
+    rightProfile_[y] =
+        std::max(rightProfile_[y], x + (t_node->labelLength - isRight) / 2); //rProfile都是放非负数
     if (t_node->right) {
         for (int i = 1; i <= t_node->edgeLength && y + i < MAX_HEIGHT; ++i) {
             rightProfile_[y + i] = std::max(rightProfile_[y + i], x + i);
@@ -235,9 +236,10 @@ void AsciiTree::computeEdgeLengths(const AsciiNodePtr t_node) {
 
 void AsciiTree::printLevel(const AsciiNodePtr node, const int x, const int level, int &print_next) {
     if (!node) return; // 空节点不作操作
-    bool isleft = node->parentDirection == -1; // 当前是否是父节点的左支，是的话要进行偏移操作
+    bool isLeft = node->parentDirection == -1; // 当前是否是父节点的左支，是的话要进行偏移操作
     if (level == 0) { //打印节点
-        auto print_size = x - print_next - (node->labelLength - isleft) / 2; //父节点x坐标减去当前层偏移量，再根据字符串长度居中
+        auto print_size =
+            x - print_next - (node->labelLength - isLeft) / 2; //父节点x坐标减去当前层偏移量，再根据字符串长度居中
         for (int i = 0; i < print_size; i++) { std::cout << " "; }
         std::cout << node->label;
 
@@ -260,11 +262,11 @@ void AsciiTree::printLevel(const AsciiNodePtr node, const int x, const int level
         }
     } else { //递归打印两个子节点，每一条边的一个成分 宽度是1，每一条边的长度+当前层级=下一节点的层级
         printLevel(node->left,
-                   x - node->edgeLength - 1,
-                   level - node->edgeLength - 1, print_next);
+            x - node->edgeLength - 1,
+            level - node->edgeLength - 1, print_next);
         printLevel(node->right,
-                   x + node->edgeLength + 1,
-                   level - node->edgeLength - 1, print_next);
+            x + node->edgeLength + 1,
+            level - node->edgeLength - 1, print_next);
     }
 }
 
@@ -279,18 +281,19 @@ void AsciiTree::print_ascii_tree(const BinaryTree &t) {
         leftProfile_[i] = INF;
     }
     computeLeftProfile(parent_root, 0, 0);
-    int xmin = 0; // 中点
+    int x_min = 0; // 中点
     for (int i = 0; i < parent_root->height && i < MAX_HEIGHT; i++) {
-        xmin = std::min(xmin, leftProfile_[i]);
+        x_min = std::min(x_min, leftProfile_[i]);
     }
     int print_next = 0;
     for (int i = 0; i < parent_root->height; i++) {
-        printLevel(parent_root, -xmin, i, print_next);
+        printLevel(parent_root, -x_min, i, print_next);
         print_next = 0; //每新的一行 归零光标 移至首位
         std::cout << std::endl;
     }
     if (parent_root->height >= MAX_HEIGHT) {
-        std::cout << "(This tree is taller than " << MAX_HEIGHT << ", and may be drawn incorrectly.)" << std::endl;
+        std::cout << "(This tree is taller than " << MAX_HEIGHT
+                  << ", and may be drawn incorrectly.)" << std::endl;
     }
 }
 
@@ -337,7 +340,8 @@ const TreeNode &BinaryTree::max() const {
 
 unsigned BinaryTree::leavesCount() const {
     unsigned count = 0U;
-    auto counter = [&count](const TreeNode &node)-> void { if (!(node.left || node.right))count++; };
+    auto counter =
+        [&count](const TreeNode &node) -> void { if (!(node.left || node.right))count++; };
     preOrderIterativeTraverse(counter);
     return count;
 }
@@ -379,7 +383,6 @@ void BinaryTree::print() const {
     t.print_ascii_tree(*this);
 }
 
-
 TreeNodePtr BinaryTree::deleteMin(TreeNodePtr node) const {
     if (!node->left) return node->right;
     node->left = deleteMin(node->left);
@@ -398,7 +401,6 @@ TreeNodePtr BinaryTree::deleteMax(TreeNodePtr node) const {
     node->size = 1 + size(node->left) + size(node->right);
     return node;
 }
-
 
 void BinaryTree::deleteMax() {
     if (emptyQ()) throw std::underflow_error("Empty Tree!");
@@ -421,21 +423,20 @@ TreeNodePtr BinaryTree::remove(TreeNodePtr node, const int key) const {
     } else { //相等，把右支最小元素提到上层来
         if (!node->right)return node->left;
         if (!node->left)return node->right;
-        auto orignal_node = node; // 备份这个要删除的节点
-        node = min(orignal_node->right); // 先找到右支最小节点
-        node->right = deleteMin(orignal_node->right); // 把原节点的右支接在最小节点右边
-        node->left = orignal_node->left; //把原节点的左支接在最小节点上
+        auto original_node = node; // 备份这个要删除的节点
+        node = min(original_node->right); // 先找到右支最小节点
+        node->right = deleteMin(original_node->right); // 把原节点的右支接在最小节点右边
+        node->left = original_node->left; //把原节点的左支接在最小节点上
     }
     return node; // 递归连接回去
 }
 
 BinaryTree::BinaryTree(const int rootKey, const int rootValue) : root_{
-    new TreeNode(rootKey, rootValue)} {}
+    new TreeNode(rootKey, rootValue)} { }
 
 BinaryTree::~BinaryTree() {
-    while (root_) root_ = deleteMin(root_);
+    while (root_) { root_ = deleteMin(root_); }
 }
-
 
 std::ostream &operator<<(std::ostream &os, const TreeNode &obj) {
     return os << obj.toString();

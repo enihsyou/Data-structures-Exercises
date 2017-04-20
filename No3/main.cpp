@@ -3,8 +3,9 @@
 #include <regex>
 #include <limits>
 
+
 namespace {
-auto print = [](const TreeNode &node)-> void { std::cout << node.key << " "; };
+auto print = [](const TreeNode &node) -> void { std::cout << node.key << " "; };
 
 void g_Clean_input() {
     std::cin.clear();
@@ -12,45 +13,49 @@ void g_Clean_input() {
     std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 }
 
-
 void tree_init(BinaryTree &tree) {
     std::string input;
     g_Clean_input();
     std::cout << "输入多组 \'整数:整数\' 来创建键值对二叉树，以分隔符分离，随时输入#打印树，输入EOF结束：\n";
-    std::regex delimeter_regex(R"([\s\|\\\/,;_]+)");
+    std::regex delimiter_regex(R"([\s\|\\\/,;_]+)");
     std::regex token_regex(R"(#|(-?\d+)\:(-?\d+))");
     const std::string MAX_INT(std::to_string(std::numeric_limits<int>::max()));
     const std::string MIN_INT(std::to_string(std::numeric_limits<int>::min()));
     while (std::getline(std::cin, input)) {
-        auto token_iterator = std::sregex_token_iterator(input.begin(), input.end(), delimeter_regex, -1);
+        auto token_iterator =
+            std::sregex_token_iterator(input.begin(), input.end(), delimiter_regex, -1);
         while (token_iterator != std::sregex_token_iterator()) {
-            std::string splited_string = token_iterator->str();
+            std::string split_string = token_iterator->str();
             ++token_iterator;
-            if (splited_string.empty()) continue;
+            if (split_string.empty()) continue;
             std::smatch token_match;
-            if (std::regex_search(splited_string, token_match, token_regex)) {
+            if (std::regex_search(split_string, token_match, token_regex)) {
                 if (token_match.str(2).empty()) {
                     tree.print();
                     continue;
                 }
                 std::string first = token_match.str(1);
                 std::string second = token_match.str(2);
-                auto compare = [](const std::string &a)-> bool {
-                        if (a.length() > 11) return false;
-                        long long tmp = std::stoll(a);
-                        if (tmp > 0 && tmp / (static_cast<long long>(std::numeric_limits<int>::max()) + 1) >= 1)return false;
-                        else if (tmp < 0 && tmp / (static_cast<long long>(std::numeric_limits<int>::min()) - 1) >= 1)return false;
-                        return true;
-                    };
+                auto compare = [](const std::string &a) -> bool {
+                    if (a.length() > 11) return false;
+                    long long tmp = std::stoll(a);
+                    if (tmp > 0
+                        && tmp / (static_cast<long long>(std::numeric_limits<int>::max()) + 1) >= 1)
+                        return false;
+                    else if (tmp < 0
+                        && tmp / (static_cast<long long>(std::numeric_limits<int>::min()) - 1) >= 1)
+                        return false;
+                    return true;
+                };
 
                 if (compare(first) && compare(second)) {
                     tree.put(std::stoi(first), std::stoi(second));
                 } else {
-                    std::cerr << splited_string << "超出表示范围，忽略" << std::endl;
+                    std::cerr << split_string << "超出表示范围，忽略" << std::endl;
                 }
                 continue;
             }
-            std::cerr << splited_string << "未能识别，忽略" << std::endl;
+            std::cerr << split_string << "未能识别，忽略" << std::endl;
         }
     }
 }
@@ -100,15 +105,15 @@ void tree_func_4(BinaryTree &tree) {
 int main() {
     BinaryTree tree = BinaryTree();
     tree_init(tree);
-    tree.put(10, 12);
-    tree.put(5, 10);
-    tree.put(15, 15);
-    tree.put(9, 14);
-    tree.put(13, 15);
-    tree.put(2, 13);
-    tree.put(6, 13);
-    tree.put(12, 13);
-    tree.put(14, 13);
+//    tree.put(10, 12);
+//    tree.put(5, 10);
+//    tree.put(15, 15);
+//    tree.put(9, 14);
+//    tree.put(13, 15);
+//    tree.put(2, 13);
+//    tree.put(6, 13);
+//    tree.put(12, 13);
+//    tree.put(14, 13);
     tree_func_1(tree);
     tree_func_2(tree);
     tree_func_3(tree);

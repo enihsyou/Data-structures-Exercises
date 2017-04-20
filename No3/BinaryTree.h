@@ -3,9 +3,12 @@
 #include <ostream>
 #include <functional>
 
+
 struct TreeNode;
 struct AsciiNode;
+
 class BinaryTree;
+
 typedef std::shared_ptr<TreeNode> TreeNodePtr;
 typedef std::shared_ptr<AsciiNode> AsciiNodePtr;
 
@@ -18,10 +21,10 @@ struct TreeNode {
     int value; //值
     unsigned size; //子树下有多少元素
     explicit TreeNode(const int key,
-                      const int value,
-                      const unsigned size = 1U) : key{key},
-                                                  value{value},
-                                                  size{size} {}
+        const int value,
+        const unsigned size = 1U) : key{key},
+        value{value},
+        size{size} { }
 
     void preOrderRecursiveTraverse(const std::function<void(const TreeNode &)> &do_on_node) const;
     void inOrderRecursiveTraverse(const std::function<void(const TreeNode &)> &do_on_node) const;
@@ -41,7 +44,6 @@ struct TreeNode {
  * \return 该节点的子元素个数，包括本身
  */
 unsigned size(const TreeNodePtr node);
-
 
 /**
  * \brief 为了输出二叉树的帮助类，保存了节点的左右支，与父节点的边长、方向，节点深度，字符标签数据
@@ -68,7 +70,7 @@ private:
 
     AsciiNodePtr buildTree(const BinaryTree &tree);
 
-    AsciiNodePtr buildTreeRecursice(const TreeNodePtr t_node) const;
+    AsciiNodePtr buildTreeRecursively(const TreeNodePtr t_node) const;
 
     /**
     * \brief 计算左支的偏离度
@@ -102,7 +104,6 @@ private:
     */
     static void printLevel(const AsciiNodePtr node, const int x, const int level, int &print_next);
 };
-
 
 /**
  * \brief 二叉树，实际上是二叉搜索树
@@ -187,6 +188,8 @@ public:
     void levelOrderBFSTraverse(const std::function<void(const TreeNode &)> &do_on_node) const;
     void swapChildren();
     void print() const;
+
     const TreeNodePtr &root() const { return root_; }
+
     friend std::ostream &operator<<(std::ostream &os, const BinaryTree &obj);
 };
