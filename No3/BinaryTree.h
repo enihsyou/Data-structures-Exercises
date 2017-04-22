@@ -3,51 +3,17 @@
 #include <ostream>
 #include <functional>
 
-
 struct TreeNode;
-struct AsciiNode;
-
 class BinaryTree;
-
 typedef std::shared_ptr<TreeNode> TreeNodePtr;
+
+namespace {
+struct AsciiNode;
 typedef std::shared_ptr<AsciiNode> AsciiNodePtr;
 
 /**
- * \brief 二叉树的节点类
- */
-struct TreeNode {
-    TreeNodePtr left = nullptr, right = nullptr; //左右支
-    int key; //键
-    int value; //值
-    unsigned size; //子树下有多少元素
-    explicit TreeNode(const int key,
-        const int value,
-        const unsigned size = 1U) : key{key},
-        value{value},
-        size{size} { }
-
-    void preOrderRecursiveTraverse(const std::function<void(const TreeNode &)> &do_on_node) const;
-    void inOrderRecursiveTraverse(const std::function<void(const TreeNode &)> &do_on_node) const;
-    void postOrderRecursiveTraverse(const std::function<void(const TreeNode &)> &do_on_node) const;
-    void preOrderIterativeTraverse(const std::function<void(const TreeNode &)> &do_on_node) const;
-    void inOrderIterativeTraverse(const std::function<void(const TreeNode &)> &do_on_node) const;
-    void postOrderIterativeTraverse(const std::function<void(const TreeNode &)> &do_on_node) const;
-    void levelOrderBFSTraverse(const std::function<void(const TreeNode &)> &do_on_node) const;
-    void swapChildren();
-    std::string toString() const;
-    friend std::ostream &operator<<(std::ostream &os, const TreeNode &obj);
-};
-
-/**
- * \brief 递归计算 以指定节点为根的二叉树 节点个数
- * \param node 二叉树的节点
- * \return 该节点的子元素个数，包括本身
- */
-unsigned size(const TreeNodePtr node);
-
-/**
- * \brief 为了输出二叉树的帮助类，保存了节点的左右支，与父节点的边长、方向，节点深度，字符标签数据
- */
+* \brief 为了输出二叉树的帮助类，保存了节点的左右支，与父节点的边长、方向，节点深度，字符标签数据
+*/
 struct AsciiNode {
     AsciiNodePtr left = nullptr, right = nullptr; //左右支
     int edgeLength;
@@ -89,9 +55,9 @@ private:
     void computeRightProfile(const AsciiNodePtr t_node, const int x, const int y);
 
     /**
-     * \brief 递归计算节点与父节点之间的边长
-     * \param t_node 要计算的节点
-     */
+    * \brief 递归计算节点与父节点之间的边长
+    * \param t_node 要计算的节点
+    */
     void computeEdgeLengths(const AsciiNodePtr t_node);
 
     /**
@@ -104,12 +70,42 @@ private:
     */
     static void printLevel(const AsciiNodePtr node, const int x, const int level, int &print_next);
 };
+}
+
+/**
+ * \brief 二叉树的节点类
+ */
+struct TreeNode {
+    TreeNodePtr left_ = nullptr, right_ = nullptr; // 左右支
+    int key_; // 键
+    int value_; // 值
+    unsigned size_ = 1U; // 子树下有多少元素，包括自身
+    explicit TreeNode(const int key, const int value, const unsigned size = 1U);
+
+    /**
+    * \brief 递归计算 以指定节点为根的二叉树 节点个数
+    * \return 该节点的子元素个数，包括本身
+    */
+    unsigned reSumSubSize();
+    void swapChildren();
+    void preOrderRecursiveTraverse(const std::function<void(const TreeNode &)> &do_on_node) const;
+    void inOrderRecursiveTraverse(const std::function<void(const TreeNode &)> &do_on_node) const;
+    void postOrderRecursiveTraverse(const std::function<void(const TreeNode &)> &do_on_node) const;
+    void preOrderIterativeTraverse(const std::function<void(const TreeNode &)> &do_on_node) const;
+    void inOrderIterativeTraverse(const std::function<void(const TreeNode &)> &do_on_node) const;
+    void postOrderIterativeTraverse(const std::function<void(const TreeNode &)> &do_on_node) const;
+    void levelOrderBFSTraverse(const std::function<void(const TreeNode &)> &do_on_node) const;
+    std::string toString() const;
+    friend std::ostream &operator<<(std::ostream &os, const TreeNode &obj);
+};
+
 
 /**
  * \brief 二叉树，实际上是二叉搜索树
  */
 class BinaryTree {
     TreeNodePtr root_ = nullptr;
+
     TreeNodePtr put(TreeNodePtr node, const int key, const int value) const;
     TreeNodePtr remove(TreeNodePtr node, const int key) const;
     TreeNodePtr min(TreeNodePtr node) const;
@@ -127,7 +123,7 @@ public:
      * \param rootValue 根节点的值
      */
     BinaryTree(const int rootKey, const int rootValue);
-    ~BinaryTree();
+    virtual ~BinaryTree();
 
     /**
      * \brief 根据键获取对应的值，会抛出std::range_error
@@ -158,7 +154,7 @@ public:
      * \brief 判断是否是空树
      * \return 树为空则返回true
      */
-    bool emptyQ() const;
+    bool emptyQ() const noexcept;
     /**
      * \brief 删除最小元素，树为空会抛出std::underflow_error
      */
@@ -177,8 +173,19 @@ public:
      * \return 最大节点的引用 ，不允许修改
      */
     const TreeNode &max() const;
-
+    /**
+     * \brief 通过递归方式，统计子叶个数，就是没有子节点的节点
+     * \return 子叶个数
+     */
     unsigned leavesCount() const;
+    /**
+    * \brief 交换两个子元素，递归的方式，可以使用下面的通用方法实现
+    */
+    void swapChildren() const;
+    /**
+    * \brief 打印出来，树状图的方式 Ascii
+    */
+    void print() const;
     void preOrderRecursiveTraverse(const std::function<void(const TreeNode &)> &do_on_node) const;
     void inOrderRecursiveTraverse(const std::function<void(const TreeNode &)> &do_on_node) const;
     void postOrderRecursiveTraverse(const std::function<void(const TreeNode &)> &do_on_node) const;
@@ -186,8 +193,6 @@ public:
     void inOrderIterativeTraverse(const std::function<void(const TreeNode &)> &do_on_node) const;
     void postOrderIterativeTraverse(const std::function<void(const TreeNode &)> &do_on_node) const;
     void levelOrderBFSTraverse(const std::function<void(const TreeNode &)> &do_on_node) const;
-    void swapChildren();
-    void print() const;
 
     const TreeNodePtr &root() const { return root_; }
 
