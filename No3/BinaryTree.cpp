@@ -101,7 +101,8 @@ void TreeNode::levelOrderBFSTraverse(const std::function<void(const TreeNode &)>
 }
 
 unsigned TreeNode::reSumSubSize() {
-    return size_ = (left_ ? left_->reSumSubSize() : 0U) + (right_ ? right_->reSumSubSize() : 0U) + 1;
+    return size_ = (left_ ? left_->reSumSubSize() : 0U)
+        + (right_ ? right_->reSumSubSize() : 0U) + 1;
 }
 
 std::string TreeNode::toString() const { return std::to_string(key_).append(":").append(std::to_string(value_)); }
@@ -253,7 +254,7 @@ void AsciiTree::print_ascii_tree(const BinaryTree &t) {
 
 int BinaryTree::get(const int key) const {
     auto node = root_;
-    while (!node) {
+    while (node) {
         auto node_value = node->key_;
         if (key < node_value) { node = node->left_; } //值比中间的小，递归插到左边
         else if (key > node_value) { node = node->right_; } //值比中间的大，递归插到右边

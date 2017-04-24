@@ -6,6 +6,17 @@
 
 namespace {
 auto print = [](const TreeNode &node) -> void { std::cout << node.key_ << " "; };
+auto Is_number_in_limits = [](const std::string &a) -> bool {
+    if (a.length() > 11) return false;
+    long long tmp = std::stoll(a);
+    if (tmp > 0
+        && tmp / (static_cast<long long>(std::numeric_limits<int>::max()) + 1) >= 1)
+        return false;
+    else if (tmp < 0
+        && tmp / (static_cast<long long>(std::numeric_limits<int>::min()) - 1) >= 1)
+        return false;
+    return true;
+};
 
 void g_Clean_input() {
     std::cin.clear();
@@ -16,9 +27,9 @@ void g_Clean_input() {
 void tree_init(BinaryTree &tree) {
     std::string input;
     g_Clean_input();
-    std::cout << "输入多组 \'整数:整数\' 来创建键值对二叉树，以分隔符分离\n输入'#'打印树，输入EOF标记或者'END'结束：\n";
+    std::cout << "输入多组 \'整数:整数\' 来创建键值对二叉树，以分隔符分离\n输入'!整数'删除对应键，'#'打印树，EOF标记或者'END'结束：\n";
     std::regex delimiter_regex(R"([\s\|\\\/,;_]+)");
-    std::regex token_regex(R"(END|#|(-?\d+)\:(-?\d+))");
+    std::regex token_regex(R"((END)|(#)|!(-?\d+)|((-?\d+)\:(-?\d+)))");
     const std::string MAX_INT(std::to_string(std::numeric_limits<int>::max()));
     const std::string MIN_INT(std::to_string(std::numeric_limits<int>::min()));
     while (getline(std::cin, input)) {
@@ -30,40 +41,29 @@ void tree_init(BinaryTree &tree) {
             if (split_string.empty()) continue;
             std::smatch token_match;
             if (regex_search(split_string, token_match, token_regex)) {
-                if (token_match.str(2).empty()) {
-                    tree.print();
-                    if (token_match.str() == "END") { return; }
-                    continue;
-                }
-                std::string first = token_match.str(1);
-                std::string second = token_match.str(2);
-                auto compare = [](const std::string &a) -> bool {
-                    if (a.length() > 11) return false;
-                    long long tmp = std::stoll(a);
-                    if (tmp > 0
-                        && tmp / (static_cast<long long>(std::numeric_limits<int>::max()) + 1) >= 1)
-                        return false;
-                    else if (tmp < 0
-                        && tmp / (static_cast<long long>(std::numeric_limits<int>::min()) - 1) >= 1)
-                        return false;
-                    return true;
-                };
-
-                if (compare(first) && compare(second)) { tree.put(std::stoi(first), std::stoi(second)); }
-                else {
-                    std::cerr << split_string << "超出表示范围，忽略" << std::endl;
-                }
-                continue;
-            }
-            std::cerr << split_string << "未能识别，忽略" << std::endl;
+                if (token_match[1].length()) { return; }
+                else if (token_match[2].length()) { tree.print(); }
+                else if (token_match[3].length()) {
+                    std::string first = token_match.str(3);
+                    if (Is_number_in_limits(first)) { // !(-?\d+)
+                        tree.remove(stoi(first));
+                    } else { std::cerr << split_string << "超出表示范围，忽略" << std::endl; }
+                } else if (token_match[4].length()) {
+                    std::string first = token_match.str(5);
+                    std::string second = token_match.str(6);
+                    if (Is_number_in_limits(first) && Is_number_in_limits(second)) { // (-?\d+)\:(-?\d+))
+                        tree.put(stoi(first), stoi(second));
+                    } else { std::cerr << split_string << "超出表示范围，忽略" << std::endl; }
+                } else { std::cerr << split_string << "未能识别，忽略" << std::endl; }
+            } else { std::cerr << split_string << "未能识别，忽略" << std::endl; }
         }
     }
 }
 
 void tree_func_1(BinaryTree &tree) {
-    std::cout << "树的当前状态：\n";
+    std::cout << "二叉树的当前状态：\n";
     tree.print();
-    std::cout << "树的前序遍历打印（非递归）：\n";
+    std::cout << "二叉树的前序遍历打印（非递归）：\n";
     tree.preOrderIterativeTraverse(print);
     std::cout << std::endl;
     std::cout << "二叉树的前序遍历打印（递归）：\n";
@@ -99,18 +99,19 @@ void tree_func_4(BinaryTree &tree) {
 }
 }
 
+//10:1 5:2 15:3 9:4,3:19 13:5|2:6 # !3 # 6:7 12:8 14:9 END
 int main() {
     BinaryTree tree = BinaryTree();
     tree_init(tree);
-    tree.put(10, 12);
-    tree.put(5, 10);
-    tree.put(15, 15);
-    tree.put(9, 14);
-    tree.put(13, 15);
-    tree.put(2, 13);
-    tree.put(6, 13);
-    tree.put(12, 13);
-    tree.put(14, 13);
+    //    tree.put(10, 12);
+    //    tree.put(5, 10);
+    //    tree.put(15, 15);
+    //    tree.put(9, 14);
+    //    tree.put(13, 15);
+    //    tree.put(2, 13);
+    //    tree.put(6, 13);
+    //    tree.put(12, 13);
+    //    tree.put(14, 13);
     tree_func_1(tree);
     tree_func_2(tree);
     tree_func_3(tree);
