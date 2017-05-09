@@ -99,7 +99,7 @@ void tree_func_4(BinaryTree &tree) {
 }
 }
 
-//10:1 5:2 15:3 9:4,3:19 13:5|2:6 # !3 # 6:7 12:8 14:9 END
+//10:1;3:19 5:2 15:3 9:4,13:5|2:6 # !3 # 6:7 12:8 14:9 END
 int main() {
     BinaryTree tree = BinaryTree();
     tree_init(tree);

@@ -78,9 +78,9 @@ private:
 struct TreeNode {
     TreeNodePtr left_ = nullptr, right_ = nullptr; // 左右支
     int key_; // 键
-    int value_; // 值
+    int value_ = 0; // 值
     unsigned size_ = 1U; // 子树下有多少元素，包括自身
-    explicit TreeNode(const int key, const int value, const unsigned size = 1U);
+    explicit TreeNode(const int key, const int value = 0, const unsigned size = 1U);
 
     /**
     * \brief 递归计算 以指定节点为根的二叉树 节点个数
