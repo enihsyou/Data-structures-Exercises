@@ -20,7 +20,8 @@ int main() {
     g.addDirectedEdge(6, 0, 0.58);
     g.addDirectedEdge(6, 4, 0.93);
     auto a  = g.depthFirstPathQ(0);
-    auto b  = g.breadthFirstPath(0);
+    auto b  = g.breadthFirstPathQ(0);
+    auto c  = g.cycleQ().cycleQ();
     std::cout << g << std::endl;
 
     return 0;

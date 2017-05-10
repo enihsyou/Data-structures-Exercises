@@ -68,7 +68,11 @@ const Graph::DepthFirstPath Graph::depthFirstPathQ(const unsigned int from) cons
     return Graph::DepthFirstPath(0, this);
 }
 
-const Graph::BreadthFirstPath Graph::breadthFirstPath(const unsigned int from) const {
+const Graph::Cycle Graph::cycleQ() const {
+    return Graph::Cycle(this);
+}
+
+const Graph::BreadthFirstPath Graph::breadthFirstPathQ(const unsigned int from) const {
     return Graph::BreadthFirstPath(0, this);
 }
 
@@ -213,9 +217,9 @@ const std::vector<unsigned int> Graph::Path::pathTo(const unsigned int to) {
 }
 
 void Graph::BreadthFirstPath::bfs(const unsigned int vertex) {
-    std::queue<unsigned int>queue;
+    std::queue<unsigned int> queue;
     queue.push(vertex);
-    while (!queue.empty()){
+    while (!queue.empty()) {
         auto q = queue.front();
         queue.pop();
         marked[q] = true;
@@ -227,4 +231,33 @@ void Graph::BreadthFirstPath::bfs(const unsigned int vertex) {
             }
         }
     }
+}
+
+bool Graph::Cycle::cycleQ() const {
+    return cycle.size() > 0;
+}
+
+void Graph::Cycle::dfs(const unsigned int vertex) {
+    onStack[vertex] = true;
+    marked[vertex] = true;
+    for (auto &&item : graph->adjacent_[vertex]) {
+        if (cycleQ()) return;
+        if (!marked[item.to]) {
+            edgeTo[item.to] = vertex;
+            dfs(item.to);
+        } else if (onStack[item.to]) {
+            auto x = item.to;
+            while (x != item.from) {
+                cycle.push(x);
+                x = edgeTo[x];
+            }
+            cycle.push(item.to);
+            return;
+        }
+    }
+    onStack[vertex] = false;
+}
+
+const std::stack<unsigned int> &Graph::Cycle::getCycle() const {
+    return cycle;
 }

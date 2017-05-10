@@ -5,6 +5,7 @@
 #ifndef NO4_GRAPH_H
 #define NO4_GRAPH_H
 #include <vector>
+#include <stack>
 #include <string>
 #include <map>
 #include <set>
@@ -111,9 +112,24 @@ class Graph {
 
     class ConnectedComponent { };
 
-    class Cycle { };
+    class Cycle {
+    protected:
+        const Graph *graph;
+        std::vector<bool> onStack;
+        std::vector<unsigned int> edgeTo;
+        std::stack<unsigned int> cycle;
+        std::vector<bool> marked;
 
-    class DirectedCycle : public Cycle { };
+        void dfs(const unsigned int vertex);
+    public:
+        Cycle(const Graph *graph) : graph{graph},
+                                    cycle{ },
+                                    onStack{std::vector<bool>(graph->vertexN_)},
+                                    edgeTo{std::vector<unsigned int>(graph->vertexN_)},
+                                    marked{std::vector<bool>(graph->vertexN_)} {}
+        bool cycleQ() const;
+        const std::stack<unsigned int> &getCycle() const;
+    };
 
     class TopologicalSort { };
 
@@ -149,8 +165,9 @@ public:
     const std::vector<unsigned int> DFS(const unsigned int source) const;
     const Connect pathQ(const unsigned int from) const;
     const DepthFirstPath depthFirstPathQ(const unsigned int from) const;
-    const BreadthFirstPath breadthFirstPath(const unsigned int from) const;
-    const Path* connectQ(const unsigned int from) const;
+    const BreadthFirstPath breadthFirstPathQ(const unsigned int from) const;
+    const Cycle cycleQ() const;
+    const Path *connectQ(const unsigned int from) const;
 
     inline const unsigned int vertexN() const { return vertexN_; };
 
