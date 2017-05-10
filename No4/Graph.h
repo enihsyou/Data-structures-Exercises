@@ -151,11 +151,21 @@ class Graph {
         DepthFirstOrder(const Graph *graph);
         unsigned int previousIndex(const unsigned int which) const;
         unsigned int postIndex(const unsigned int which) const;
+        const std::vector<unsigned int> reversePostOrder() const;
         const std::queue<unsigned int> &getPreOrder() const;
         const std::queue<unsigned int> &getPostOrder() const;
     };
 
-    class TopologicalSort { };
+    class TopologicalSort {
+    protected:
+        const Graph *graph_;
+        std::vector<unsigned int> rank_;
+        std::vector<unsigned int> order_;
+    public:
+        TopologicalSort(const Graph *graph);
+        bool hasOrder()const;
+        unsigned int rank(const unsigned int which);
+    };
 
     class KosarajuStrongConnectedComponent : public StrongConnectedComponent { };
 
@@ -189,6 +199,7 @@ public:
     const Graph::Cycle cycleQ() const;
     const Graph::DepthFirstOrder depthFirstOrderQ() const;
     const Graph::ConnectedComponent connectedComponentQ() const;
+    const Graph::TopologicalSort topologicalSort() const;
 //    const Path *connectQ(const unsigned int from) const;
 
     inline const unsigned int vertexN() const { return vertexN_; };

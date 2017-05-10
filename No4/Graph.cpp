@@ -1,6 +1,7 @@
 #include <queue>
 #include <stack>
 #include <iomanip>
+#include <algorithm>
 #include "Graph.h"
 
 double Edge::default_value = 0.0;
@@ -201,6 +202,10 @@ const Graph::ConnectedComponent Graph::connectedComponentQ() const {
     return Graph::ConnectedComponent(this);
 }
 
+const Graph::TopologicalSort Graph::topologicalSort() const {
+    return Graph::TopologicalSort(this);
+}
+
 void Graph::DepthFirstPath::dfs(const unsigned int vertex) {
     marked_[vertex] = true;
     for (auto &&item : graph_->adjacent_[vertex]) {
@@ -347,6 +352,18 @@ unsigned int Graph::DepthFirstOrder::postIndex(const unsigned int which) const {
     return postList_[which];
 }
 
+const std::vector<unsigned int> Graph::DepthFirstOrder::reversePostOrder() const {
+    std::vector<unsigned int> reversed_vector;
+    std::queue<unsigned int> temp_queue = postOrder_;
+    while (!temp_queue.empty()) {
+        reversed_vector.push_back(temp_queue.front());
+        temp_queue.pop();
+    }
+    std::reverse(reversed_vector.begin(), reversed_vector.end());
+    return reversed_vector;
+}
+
+
 Graph::ConnectedComponent::ConnectedComponent(const Graph *graph)
     : graph_(graph),
       marked_(std::vector<bool>(graph->vertexN_)),
@@ -391,3 +408,26 @@ bool Graph::ConnectedComponent::isConnected(const unsigned int first, const unsi
 }
 
 Graph::StrongConnectedComponent::StrongConnectedComponent(const Graph *graph) : ConnectedComponent(graph) { }
+
+Graph::TopologicalSort::TopologicalSort(const Graph *graph)
+    : graph_(graph), rank_(std::vector<unsigned int>(graph->vertexN_)) {
+    Cycle finder = Cycle(graph);
+    if (!finder.cycleQ()) {
+        DepthFirstOrder depthFirstOrder = DepthFirstOrder(graph);
+        order_ = depthFirstOrder.reversePostOrder();
+        unsigned int i = 0;
+        for (auto &&item : order_) {
+            rank_[item] = i++;
+        }
+    }
+}
+
+bool Graph::TopologicalSort::hasOrder() const {
+    return !order_.empty();
+}
+
+unsigned int Graph::TopologicalSort::rank(const unsigned int which) {
+    graph_->validateVertex(which);
+    if (hasOrder()) return rank_[which];
+    throw std::runtime_error("cycle");
+}

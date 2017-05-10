@@ -24,6 +24,7 @@ int main() {
     auto c  = g.cycleQ();
     auto d  = g.depthFirstOrderQ();
     auto e  = g.connectedComponentQ();
+    auto f  = g.topologicalSort();
     std::cout << g << std::endl;
 
     return 0;
