@@ -21,8 +21,9 @@ int main() {
     g.addDirectedEdge(6, 4, 0.93);
     auto a  = g.depthFirstPathQ(0);
     auto b  = g.breadthFirstPathQ(0);
-    auto c  = g.cycleQ().cycleQ();
+    auto c  = g.cycleQ();
     auto d  = g.depthFirstOrderQ();
+    auto e  = g.connectedComponentQ();
     std::cout << g << std::endl;
 
     return 0;

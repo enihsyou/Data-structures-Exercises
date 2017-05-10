@@ -1,7 +1,3 @@
-//
-// Created by Shane on 2017/5/9.
-//
-
 #ifndef NO4_GRAPH_H
 #define NO4_GRAPH_H
 #include <vector>
@@ -17,17 +13,13 @@ struct Edge {
     const unsigned int to;
     const double weight;
 
-    Edge(const unsigned int from, const unsigned int to, const double weight = default_value)
-        : from(from), to(to), weight(weight) { }
+    Edge(const unsigned int from, const unsigned int to, const double weight = default_value);
 
     static double default_value;
 
     static void setDefault(const double new_default) { Edge::default_value = new_default; };
 
-    friend std::ostream &operator<<(std::ostream &os, const Edge &edge) {
-        os << "from: " << edge.from << " to: " << edge.to << " weight: " << edge.weight;
-        return os;
-    }
+    friend std::ostream &operator<<(std::ostream &os, const Edge &edge);
 };
 
 
@@ -48,7 +40,7 @@ class AdjacentMatrixGraph {
 
     void validateVertex(const unsigned int v) const;
 public:
-    AdjacentMatrixGraph(const unsigned int vertexN) : vertexN_(vertexN), adjacent_{new bool[vertexN]} { }
+    AdjacentMatrixGraph(const unsigned int vertexN);
 
     const std::vector<unsigned int> BFS(const unsigned int from);
     const std::vector<unsigned int> DFS(const unsigned int from);
@@ -61,11 +53,14 @@ class Graph {
     unsigned int edgeN_;
     std::vector<unsigned int> inDegreeN_;
     std::vector<std::vector<Edge>> adjacent_;
-//    std::vector<std::string> label_;
+    //    std::vector<std::string> label_;
 
     void validateVertex(const unsigned int v) const;
+
     enum STATUS {
-        OK, READY, FAIL
+        OK,
+        READY,
+        FAIL
     };
 
     class Connect {
@@ -78,16 +73,13 @@ class Graph {
 
     class Path {
     protected:
-        const Graph *graph;
-        const unsigned int source;
-        std::vector<unsigned int> edgeTo;
-        std::vector<unsigned int> distTo;
-        std::vector<bool> marked;
+        const Graph *graph_;
+        const unsigned int source_;
+        std::vector<unsigned int> edgeTo_;
+        std::vector<unsigned int> distTo_;
+        std::vector<bool> marked_;
     public:
-        Path(const unsigned int from, const Graph *graph) : source{from}, graph{graph},
-                                                            marked{std::vector<bool>(graph->vertexN_)},
-                                                            distTo{std::vector<unsigned int>(graph->vertexN_, -1)},
-                                                            edgeTo{std::vector<unsigned int>(graph->vertexN_)} { };
+        Path(const unsigned int source, const Graph *graph);;
         bool hasPathTo(const unsigned int to);
         const std::vector<unsigned int> pathTo(const unsigned int to);
         int distanceTo(const unsigned int vertex);
@@ -96,40 +88,48 @@ class Graph {
     class DepthFirstPath : public Path {
         void dfs(const unsigned int vertex);
     public:
-        DepthFirstPath(const unsigned int from, const Graph *graph) : Path{from, graph} {
-            graph->validateVertex(from);
-            distTo[from] = 0;
-            dfs(from);
-        };
+        DepthFirstPath(const unsigned int source, const Graph *graph);
     };
 
     class BreadthFirstPath : public Path {
         void bfs(const unsigned int vertex);
     public:
-        BreadthFirstPath(const unsigned int from, const Graph *graph) : Path{from, graph} {
-            graph->validateVertex(from);
-            distTo[from] = 0;
-            bfs(from);
-        };
+        BreadthFirstPath(const unsigned int source, const Graph *graph);
     };
 
-    class ConnectedComponent { };
+    class ConnectedComponent {
+    protected:
+        const Graph *graph_;
+        std::vector<bool> marked_;
+        std::vector<unsigned int> componentId_;
+        std::vector<unsigned int> idSize_;
+        unsigned int componentN_;
+        void dfs(const unsigned int vertex);
+    public:
+        ConnectedComponent(const Graph *graph);
+        unsigned int componentId(const unsigned int which) const;
+        unsigned int componentSize(const unsigned int which) const;
+        unsigned int count() const;
+        bool isConnected(const unsigned int first, const unsigned int second);
+    };
+
+    class StrongConnectedComponent : public ConnectedComponent {
+    public:
+        StrongConnectedComponent(const Graph *graph);
+
+    };
 
     class Cycle {
     protected:
-        const Graph *graph;
-        std::vector<bool> onStack;
-        std::vector<unsigned int> edgeTo;
-        std::stack<unsigned int> cycle;
-        std::vector<bool> marked;
+        const Graph *graph_;
+        std::vector<bool> onStack_;
+        std::vector<unsigned int> edgeTo_;
+        std::stack<unsigned int> cycle_;
+        std::vector<bool> marked_;
 
         void dfs(const unsigned int vertex);
     public:
-        Cycle(const Graph *graph) : graph{graph},
-                                    cycle{ },
-                                    onStack{std::vector<bool>(graph->vertexN_)},
-                                    edgeTo{std::vector<unsigned int>(graph->vertexN_)},
-                                    marked{std::vector<bool>(graph->vertexN_)} { }
+        Cycle(const Graph *graph);
 
         bool cycleQ() const;
         const std::stack<unsigned int> &getCycle() const;
@@ -137,14 +137,14 @@ class Graph {
 
     class DepthFirstOrder {
     protected:
-        const Graph *graph;
-        std::vector<bool> marked;
-        std::vector<unsigned int> pre;
-        std::vector<unsigned int> post;
-        std::queue<unsigned int> preOrder;
-        std::queue<unsigned int> postOrder;
-        unsigned int preCounter;
-        unsigned int postCounter;
+        const Graph *graph_;
+        std::vector<bool> marked_;
+        std::vector<unsigned int> preList_;
+        std::vector<unsigned int> postList_;
+        std::queue<unsigned int> preOrder_;
+        std::queue<unsigned int> postOrder_;
+        unsigned int preCounter_;
+        unsigned int postCounter_;
 
         void dfs(const unsigned int vertex);
     public:
@@ -156,8 +156,6 @@ class Graph {
     };
 
     class TopologicalSort { };
-
-    class StrongConnectedComponent : public ConnectedComponent { };
 
     class KosarajuStrongConnectedComponent : public StrongConnectedComponent { };
 
@@ -180,17 +178,18 @@ class Graph {
 public:
     explicit Graph(const unsigned int vertexN);
     void addEdge(const Edge &edge);
-    void addUndirectedEdge(const unsigned int from, const unsigned int to, const double weight = Edge::default_value);
+    void addBidirectedEdge(const unsigned int from, const unsigned int to, const double weight = Edge::default_value);
     void addDirectedEdge(const unsigned int from, const unsigned int to, const double weight = Edge::default_value);
     const std::vector<std::vector<double>> adjacentMatrix() const;
     const std::vector<unsigned int> BFS(const unsigned int source) const;
     const std::vector<unsigned int> DFS(const unsigned int source) const;
-    const Connect pathQ(const unsigned int from) const;
-    const DepthFirstPath depthFirstPathQ(const unsigned int from) const;
-    const BreadthFirstPath breadthFirstPathQ(const unsigned int from) const;
-    const Cycle cycleQ() const;
-    const DepthFirstOrder depthFirstOrderQ() const;
-    const Path *connectQ(const unsigned int from) const;
+//    const Graph::Connect pathQ(const unsigned int from) const;
+    const Graph::DepthFirstPath depthFirstPathQ(const unsigned int from) const;
+    const Graph::BreadthFirstPath breadthFirstPathQ(const unsigned int from) const;
+    const Graph::Cycle cycleQ() const;
+    const Graph::DepthFirstOrder depthFirstOrderQ() const;
+    const Graph::ConnectedComponent connectedComponentQ() const;
+//    const Path *connectQ(const unsigned int from) const;
 
     inline const unsigned int vertexN() const { return vertexN_; };
 

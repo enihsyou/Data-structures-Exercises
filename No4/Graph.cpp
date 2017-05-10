@@ -1,83 +1,18 @@
-//
-// Created by Shane on 2017/5/9.
-//
-
 #include <queue>
 #include <stack>
 #include <iomanip>
 #include "Graph.h"
 
-
 double Edge::default_value = 0.0;
 
-Graph::Graph(const unsigned int vertexN) : vertexN_{vertexN}, edgeN_{0U},
-                                           inDegreeN_{std::vector<unsigned int>(vertexN)},
-                                           adjacent_{std::vector<std::vector<Edge>>(vertexN)} { }
+Edge::Edge(const unsigned int from, const unsigned int to, const double weight)
+    : from(from),
+      to(to),
+      weight(weight) { }
 
-void Graph::validateVertex(const unsigned int v) const {
-    if (v >= vertexN_) throw std::invalid_argument("Invalid");
-}
-
-void AdjacentMatrixGraph::validateVertex(const unsigned int v) const {
-    if (v >= vertexN_) throw std::invalid_argument("Invalid");
-}
-
-void Graph::addUndirectedEdge(const unsigned int from, const unsigned int to, const double weight) {
-    validateVertex(from);
-    validateVertex(to);
-    Edge edge = Edge(from, to, weight);
-    adjacent_[from].push_back(edge);
-    adjacent_[to].push_back(std::move(edge));
-    inDegreeN_[from]++;
-    inDegreeN_[to]++;
-    edgeN_++;
-}
-
-void Graph::addDirectedEdge(const unsigned int from, const unsigned int to, const double weight) {
-    validateVertex(from);
-    validateVertex(to);
-    Edge edge = Edge(from, to, weight);
-    adjacent_[from].push_back(edge);
-    inDegreeN_[from]++;
-    edgeN_++;
-}
-
-std::ostream &operator<<(std::ostream &os, const Graph &graph) {
-    auto matrix = graph.adjacentMatrix();
-    for (auto &&item : matrix) {
-        for (auto &&item2 : item) {
-            os << std::setw(5) << std::setprecision(4) << item2 << " ";
-        }
-        os << std::endl;
-    }
+std::ostream &operator<<(std::ostream &os, const Edge &edge) {
+    os << "from: " << edge.from << " to: " << edge.to << " weight: " << edge.weight;
     return os;
-}
-
-const std::vector<std::vector<double>> Graph::adjacentMatrix() const {
-    auto adjacent = std::vector<std::vector<double>>(vertexN_);
-    adjacent.assign(vertexN_, std::vector<double>(vertexN_));
-    for (const std::vector<std::vector<Edge>>::value_type &item : adjacent_) {
-        for (const std::vector<Edge>::value_type &item2 : item) {
-            adjacent[item2.from][item2.to] = item2.weight;
-        }
-    }
-    return adjacent;
-}
-
-const Graph::DepthFirstPath Graph::depthFirstPathQ(const unsigned int from) const {
-    return Graph::DepthFirstPath(0, this);
-}
-
-const Graph::Cycle Graph::cycleQ() const {
-    return Graph::Cycle(this);
-}
-
-const Graph::BreadthFirstPath Graph::breadthFirstPathQ(const unsigned int from) const {
-    return Graph::BreadthFirstPath(0, this);
-}
-
-const Graph::DepthFirstOrder Graph::depthFirstOrderQ() const {
-    return Graph::DepthFirstOrder(this);
 }
 
 const std::vector<unsigned int> AdjacentMatrixGraph::BFS(const unsigned int from) {
@@ -138,22 +73,30 @@ std::ostream &operator<<(std::ostream &os, const AdjacentMatrixGraph &graph) {
     return os;
 }
 
-//const std::vector<unsigned int> Graph::BFS(const unsigned int source) const {
-//    validateVertex(source);
+AdjacentMatrixGraph::AdjacentMatrixGraph(const unsigned int vertexN)
+    : vertexN_(vertexN),
+      adjacent_{new bool[vertexN]} { }
+
+void AdjacentMatrixGraph::validateVertex(const unsigned int v) const {
+    if (v >= vertexN_) throw std::invalid_argument("Invalid");
+}
+
+//const std::vector<unsigned int> Graph::BFS(const unsigned int source_) const {
+//    validateVertex(source_);
 //    std::vector<unsigned int> result;
 //    std::queue<unsigned int> queue;
-//    bool marked[vertexN_] = { };
-//    queue.push(source);
+//    bool marked_[vertexN_] = { };
+//    queue.push(source_);
 //    while (!queue.empty()) {
 //        auto neighbor_p = adjacent_.find(queue.front());
 //        queue.pop();
 //        if (neighbor_p != adjacent_.end()) {
 //            auto &self = neighbor_p->first;
-//            if (marked[self]) continue;
-//            marked[self] = true;
+//            if (marked_[self]) continue;
+//            marked_[self] = true;
 //            result.push_back(self);
 //            for (auto &&entry : neighbor_p->second) {
-//                if (!marked[entry]) {
+//                if (!marked_[entry]) {
 //                    queue.push(entry);
 //                }
 //            }
@@ -163,22 +106,22 @@ std::ostream &operator<<(std::ostream &os, const AdjacentMatrixGraph &graph) {
 //    return result;
 //}
 //
-//const std::vector<unsigned int> Graph::DFS(const unsigned int source) const {
-//    validateVertex(source);
+//const std::vector<unsigned int> Graph::DFS(const unsigned int source_) const {
+//    validateVertex(source_);
 //    std::vector<unsigned int> result;
 //    std::stack<unsigned int> stack;
-//    bool marked[vertexN_] = { };
-//    stack.push(source);
+//    bool marked_[vertexN_] = { };
+//    stack.push(source_);
 //    while (!stack.empty()) {
 //        auto neighbor_p = adjacent_.find(stack.top());
 //        stack.pop();
 //        if (neighbor_p != adjacent_.end()) {
 //            auto &self = neighbor_p->first;
-//            if (marked[self]) continue;
-//            marked[self] = true;
+//            if (marked_[self]) continue;
+//            marked_[self] = true;
 //            result.push_back(self);
 //            for (auto &&entry : neighbor_p->second) {
-//                if (!marked[entry]) {
+//                if (!marked_[entry]) {
 //                    stack.push(entry);
 //                }
 //            }
@@ -187,36 +130,120 @@ std::ostream &operator<<(std::ostream &os, const AdjacentMatrixGraph &graph) {
 //
 //    return result;
 //}
+Graph::Graph(const unsigned int vertexN) : vertexN_{vertexN},
+                                           edgeN_{0U},
+                                           inDegreeN_{std::vector<unsigned int>(vertexN)},
+                                           adjacent_{std::vector<std::vector<Edge>>(vertexN)} { }
 
-bool Graph::Path::hasPathTo(const unsigned int to) {
-    graph->validateVertex(to);
-    return marked[to];
+void Graph::validateVertex(const unsigned int v) const {
+    if (v >= vertexN_) throw std::invalid_argument("Invalid");
+}
+
+void Graph::addBidirectedEdge(const unsigned int from, const unsigned int to, const double weight) {
+    validateVertex(from);
+    validateVertex(to);
+    Edge edge = Edge(from, to, weight);
+    adjacent_[from].push_back(edge);
+    adjacent_[to].push_back(std::move(edge));
+    inDegreeN_[from]++;
+    inDegreeN_[to]++;
+    edgeN_++;
+}
+
+void Graph::addDirectedEdge(const unsigned int from, const unsigned int to, const double weight) {
+    validateVertex(from);
+    validateVertex(to);
+    Edge edge = Edge(from, to, weight);
+    adjacent_[from].push_back(edge);
+    inDegreeN_[from]++;
+    edgeN_++;
+}
+
+std::ostream &operator<<(std::ostream &os, const Graph &graph) {
+    auto matrix = graph.adjacentMatrix();
+    for (auto &&item : matrix) {
+        for (auto &&item2 : item) {
+            os << std::setw(5) << std::setprecision(4) << item2 << " ";
+        }
+        os << std::endl;
+    }
+    return os;
+}
+
+const std::vector<std::vector<double>> Graph::adjacentMatrix() const {
+    auto adjacent = std::vector<std::vector<double>>(vertexN_);
+    adjacent.assign(vertexN_, std::vector<double>(vertexN_));
+    for (const std::vector<std::vector<Edge>>::value_type &item : adjacent_) {
+        for (const std::vector<Edge>::value_type &item2 : item) {
+            adjacent[item2.from][item2.to] = item2.weight;
+        }
+    }
+    return adjacent;
+}
+
+const Graph::DepthFirstPath Graph::depthFirstPathQ(const unsigned int from) const {
+    return Graph::DepthFirstPath(0, this);
+}
+
+const Graph::BreadthFirstPath Graph::breadthFirstPathQ(const unsigned int from) const {
+    return Graph::BreadthFirstPath(0, this);
+}
+
+const Graph::Cycle Graph::cycleQ() const {
+    return Graph::Cycle(this);
+}
+
+const Graph::DepthFirstOrder Graph::depthFirstOrderQ() const {
+    return Graph::DepthFirstOrder(this);
+}
+
+const Graph::ConnectedComponent Graph::connectedComponentQ() const {
+    return Graph::ConnectedComponent(this);
 }
 
 void Graph::DepthFirstPath::dfs(const unsigned int vertex) {
-    marked[vertex] = true;
-    for (auto &&item : graph->adjacent_[vertex]) {
-        if (!marked[item.to]) {
-            edgeTo[item.to] = vertex;
-            distTo[item.to] = distTo[item.from] + 1;
+    marked_[vertex] = true;
+    for (auto &&item : graph_->adjacent_[vertex]) {
+        if (!marked_[item.to]) {
+            edgeTo_[item.to] = vertex;
+            distTo_[item.to] = distTo_[item.from] + 1;
             dfs(item.to);
         }
     }
 }
 
+Graph::DepthFirstPath::DepthFirstPath(const unsigned int source, const Graph *graph) : Path{source, graph} {
+    graph->validateVertex(source);
+    distTo_[source] = 0;
+    dfs(source);
+}
+
+Graph::Path::Path(const unsigned int source, const Graph *graph) : source_{source},
+                                                                   graph_{graph},
+                                                                   marked_{std::vector<bool>(graph->vertexN_)},
+                                                                   distTo_{
+                                                                       std::vector<unsigned int>(graph->vertexN_, -1)},
+                                                                   edgeTo_{
+                                                                       std::vector<unsigned int>(graph->vertexN_)} { }
+
+bool Graph::Path::hasPathTo(const unsigned int to) {
+    graph_->validateVertex(to);
+    return marked_[to];
+}
+
 int Graph::Path::distanceTo(const unsigned int vertex) {
-    graph->validateVertex(vertex);
-    return distTo[vertex];
+    graph_->validateVertex(vertex);
+    return distTo_[vertex];
 }
 
 const std::vector<unsigned int> Graph::Path::pathTo(const unsigned int to) {
-    graph->validateVertex(to);
+    graph_->validateVertex(to);
     if (!hasPathTo(to)) return { };
     std::stack<unsigned int> path;
-    for (auto x = to; x != source; x = edgeTo[x]) {
+    for (auto x = to; x != source_; x = edgeTo_[x]) {
         path.push(x);
     }
-    path.push(source);
+    path.push(source_);
     return std::vector<unsigned int>(&path.top() + 1 - path.size(), &path.top() + 1);
 }
 
@@ -226,84 +253,141 @@ void Graph::BreadthFirstPath::bfs(const unsigned int vertex) {
     while (!queue.empty()) {
         auto q = queue.front();
         queue.pop();
-        marked[q] = true;
-        for (auto &&item : graph->adjacent_[q]) {
-            if (!marked[item.to]) {
-                edgeTo[item.to] = q;
-                distTo[item.to] = distTo[item.from] + 1;
+        marked_[q] = true;
+        for (auto &&item : graph_->adjacent_[q]) {
+            if (!marked_[item.to]) {
+                edgeTo_[item.to] = q;
+                distTo_[item.to] = distTo_[item.from] + 1;
                 queue.push(item.to);
             }
         }
     }
 }
 
+Graph::BreadthFirstPath::BreadthFirstPath(const unsigned int source, const Graph *graph) : Path{source, graph} {
+    graph->validateVertex(source);
+    distTo_[source] = 0;
+    bfs(source);
+}
+
 bool Graph::Cycle::cycleQ() const {
-    return cycle.size() > 0;
+    return cycle_.size() > 0;
 }
 
 void Graph::Cycle::dfs(const unsigned int vertex) {
-    onStack[vertex] = true;
-    marked[vertex] = true;
-    for (auto &&item : graph->adjacent_[vertex]) {
+    onStack_[vertex] = true;
+    marked_[vertex] = true;
+    for (auto &&item : graph_->adjacent_[vertex]) {
         if (cycleQ()) return;
-        if (!marked[item.to]) {
-            edgeTo[item.to] = vertex;
+        if (!marked_[item.to]) {
+            edgeTo_[item.to] = vertex;
             dfs(item.to);
-        } else if (onStack[item.to]) {
+        } else if (onStack_[item.to]) {
             auto x = item.to;
             while (x != item.from) {
-                cycle.push(x);
-                x = edgeTo[x];
+                cycle_.push(x);
+                x = edgeTo_[x];
             }
-            cycle.push(item.to);
+            cycle_.push(item.to);
             return;
         }
     }
-    onStack[vertex] = false;
+    onStack_[vertex] = false;
 }
 
 const std::stack<unsigned int> &Graph::Cycle::getCycle() const {
-    return cycle;
+    return cycle_;
 }
 
-Graph::DepthFirstOrder::DepthFirstOrder(const Graph *graph) : graph(graph),
-                                                              marked{std::vector<bool>(graph->vertexN_)},
-                                                              pre{std::vector<unsigned int>(graph->vertexN_)},
-                                                              post{std::vector<unsigned int>(graph->vertexN_)},
-                                                              preOrder{ },
-                                                              postOrder{ },
-                                                              preCounter{0},
-                                                              postCounter{0} {
+Graph::Cycle::Cycle(const Graph *graph) : graph_{graph},
+                                          cycle_{ },
+                                          onStack_{std::vector<bool>(graph->vertexN_)},
+                                          edgeTo_{std::vector<unsigned int>(graph->vertexN_)},
+                                          marked_{std::vector<bool>(graph->vertexN_)} { }
+
+Graph::DepthFirstOrder::DepthFirstOrder(const Graph *graph) : graph_(graph),
+                                                              marked_{std::vector<bool>(graph->vertexN_)},
+                                                              preList_{std::vector<unsigned int>(graph->vertexN_)},
+                                                              postList_{std::vector<unsigned int>(graph->vertexN_)},
+                                                              preOrder_{ },
+                                                              postOrder_{ },
+                                                              preCounter_{0},
+                                                              postCounter_{0} {
     for (unsigned int i = 0; i < graph->vertexN_; ++i) {
-        if (!marked[i]) dfs(i);
+        if (!marked_[i]) dfs(i);
     }
 }
 
 void Graph::DepthFirstOrder::dfs(const unsigned int vertex) {
-    marked[vertex] = true;
-    pre[vertex] = preCounter++;
-    preOrder.push(vertex);
-    for (auto &&item : graph->adjacent_[vertex]) {
-        if (!marked[item.to]) dfs(item.to);
+    marked_[vertex] = true;
+    preList_[vertex] = preCounter_++;
+    preOrder_.push(vertex);
+    for (auto &&item : graph_->adjacent_[vertex]) {
+        if (!marked_[item.to]) dfs(item.to);
     }
-    postOrder.push(vertex);
-    post[vertex] = postCounter++;
+    postOrder_.push(vertex);
+    postList_[vertex] = postCounter_++;
 }
 
 const std::queue<unsigned int> &Graph::DepthFirstOrder::getPreOrder() const {
-    return preOrder;
+    return preOrder_;
 }
 
 const std::queue<unsigned int> &Graph::DepthFirstOrder::getPostOrder() const {
-    return postOrder;
+    return postOrder_;
 }
 
 unsigned int Graph::DepthFirstOrder::previousIndex(const unsigned int which) const {
-    graph->validateVertex(which);
-    return pre[which];
+    graph_->validateVertex(which);
+    return preList_[which];
 }
 
 unsigned int Graph::DepthFirstOrder::postIndex(const unsigned int which) const {
-    graph->validateVertex(which);
-    return post[which];
+    graph_->validateVertex(which);
+    return postList_[which];
 }
+
+Graph::ConnectedComponent::ConnectedComponent(const Graph *graph)
+    : graph_(graph),
+      marked_(std::vector<bool>(graph->vertexN_)),
+      componentId_(std::vector<unsigned int>(graph->vertexN_)),
+      idSize_(std::vector<unsigned int>(graph->vertexN_)),
+      componentN_(0U) {
+    for (unsigned int i = 0; i < graph->vertexN_; ++i) {
+        if (!marked_[i]) {
+            dfs(i);
+            componentN_++;
+        }
+    }
+}
+
+void Graph::ConnectedComponent::dfs(const unsigned int vertex) {
+    marked_[vertex] = true;
+    componentId_[vertex] = componentN_;
+    idSize_[componentN_]++;
+    for (auto &&item : graph_->adjacent_[vertex]) {
+        if (!marked_[item.to]) dfs(item.to);
+    }
+}
+
+unsigned int Graph::ConnectedComponent::componentId(const unsigned int which) const {
+    graph_->validateVertex(which);
+    return componentId_[which];
+}
+
+unsigned int Graph::ConnectedComponent::componentSize(const unsigned int which) const {
+    graph_->validateVertex(which);
+    return idSize_[componentId_[which]];
+}
+
+unsigned int Graph::ConnectedComponent::count() const {
+    return componentN_;
+}
+
+bool Graph::ConnectedComponent::isConnected(const unsigned int first, const unsigned int second) {
+    graph_->validateVertex(first);
+    graph_->validateVertex(second);
+    return componentId_[first] == componentId_[second];
+}
+
+Graph::StrongConnectedComponent::StrongConnectedComponent(const Graph *graph) : ConnectedComponent(graph) { }
