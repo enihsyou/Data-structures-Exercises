@@ -25,6 +25,7 @@ int main() {
     auto d  = g.depthFirstOrderQ();
     auto e  = g.connectedComponentQ();
     auto f  = g.topologicalSort();
+    auto h  = g.kosarajuSharirStrongConnectedComponent();
     std::cout << g << std::endl;
 
     return 0;

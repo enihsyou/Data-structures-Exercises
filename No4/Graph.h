@@ -113,12 +113,6 @@ class Graph {
         bool isConnected(const unsigned int first, const unsigned int second);
     };
 
-    class StrongConnectedComponent : public ConnectedComponent {
-    public:
-        StrongConnectedComponent(const Graph *graph);
-
-    };
-
     class Cycle {
     protected:
         const Graph *graph_;
@@ -167,7 +161,10 @@ class Graph {
         unsigned int rank(const unsigned int which);
     };
 
-    class KosarajuStrongConnectedComponent : public StrongConnectedComponent { };
+    class KosarajuSharirStrongConnectedComponent : public ConnectedComponent {
+    public:
+        KosarajuSharirStrongConnectedComponent(const Graph *graph);
+    };
 
     class MinimumSpanningTree { };
 
@@ -191,6 +188,7 @@ public:
     void addBidirectedEdge(const unsigned int from, const unsigned int to, const double weight = Edge::default_value);
     void addDirectedEdge(const unsigned int from, const unsigned int to, const double weight = Edge::default_value);
     const std::vector<std::vector<double>> adjacentMatrix() const;
+    Graph reverse() const;
     const std::vector<unsigned int> BFS(const unsigned int source) const;
     const std::vector<unsigned int> DFS(const unsigned int source) const;
 //    const Graph::Connect pathQ(const unsigned int from) const;
@@ -200,6 +198,7 @@ public:
     const Graph::DepthFirstOrder depthFirstOrderQ() const;
     const Graph::ConnectedComponent connectedComponentQ() const;
     const Graph::TopologicalSort topologicalSort() const;
+    const Graph::KosarajuSharirStrongConnectedComponent kosarajuSharirStrongConnectedComponent() const;
 //    const Path *connectQ(const unsigned int from) const;
 
     inline const unsigned int vertexN() const { return vertexN_; };

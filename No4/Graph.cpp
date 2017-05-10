@@ -206,6 +206,20 @@ const Graph::TopologicalSort Graph::topologicalSort() const {
     return Graph::TopologicalSort(this);
 }
 
+Graph Graph::reverse() const {
+    Graph graph = Graph(vertexN_);
+    for (auto &&item : adjacent_) {
+        for (auto &&item2 : item) {
+            graph.addBidirectedEdge(item2.to, item2.from);
+        }
+    }
+    return graph;
+}
+
+const Graph::KosarajuSharirStrongConnectedComponent Graph::kosarajuSharirStrongConnectedComponent() const {
+    return Graph::KosarajuSharirStrongConnectedComponent(this);
+}
+
 void Graph::DepthFirstPath::dfs(const unsigned int vertex) {
     marked_[vertex] = true;
     for (auto &&item : graph_->adjacent_[vertex]) {
@@ -407,8 +421,6 @@ bool Graph::ConnectedComponent::isConnected(const unsigned int first, const unsi
     return componentId_[first] == componentId_[second];
 }
 
-Graph::StrongConnectedComponent::StrongConnectedComponent(const Graph *graph) : ConnectedComponent(graph) { }
-
 Graph::TopologicalSort::TopologicalSort(const Graph *graph)
     : graph_(graph), rank_(std::vector<unsigned int>(graph->vertexN_)) {
     Cycle finder = Cycle(graph);
@@ -430,4 +442,16 @@ unsigned int Graph::TopologicalSort::rank(const unsigned int which) {
     graph_->validateVertex(which);
     if (hasOrder()) return rank_[which];
     throw std::runtime_error("cycle");
+}
+
+Graph::KosarajuSharirStrongConnectedComponent::KosarajuSharirStrongConnectedComponent(const Graph *graph)
+    : ConnectedComponent(graph) {
+    const Graph &graph1 = graph->reverse();
+    DepthFirstOrder depthFirstOrder = DepthFirstOrder(&graph1);
+    for (auto &&v : depthFirstOrder.reversePostOrder()) {
+        if (!marked_[v]){
+            dfs(v);
+            componentN_++;
+        }
+    }
 }
