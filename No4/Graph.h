@@ -6,7 +6,7 @@
 #define NO4_GRAPH_H
 #include <vector>
 #include <stack>
-#include <string>
+#include <queue>
 #include <map>
 #include <set>
 #include <ostream>
@@ -64,6 +64,9 @@ class Graph {
 //    std::vector<std::string> label_;
 
     void validateVertex(const unsigned int v) const;
+    enum STATUS {
+        OK, READY, FAIL
+    };
 
     class Connect {
         const unsigned int from_;
@@ -126,14 +129,33 @@ class Graph {
                                     cycle{ },
                                     onStack{std::vector<bool>(graph->vertexN_)},
                                     edgeTo{std::vector<unsigned int>(graph->vertexN_)},
-                                    marked{std::vector<bool>(graph->vertexN_)} {}
+                                    marked{std::vector<bool>(graph->vertexN_)} { }
+
         bool cycleQ() const;
         const std::stack<unsigned int> &getCycle() const;
     };
 
-    class TopologicalSort { };
+    class DepthFirstOrder {
+    protected:
+        const Graph *graph;
+        std::vector<bool> marked;
+        std::vector<unsigned int> pre;
+        std::vector<unsigned int> post;
+        std::queue<unsigned int> preOrder;
+        std::queue<unsigned int> postOrder;
+        unsigned int preCounter;
+        unsigned int postCounter;
 
-    class DepthFirstOrder { };
+        void dfs(const unsigned int vertex);
+    public:
+        DepthFirstOrder(const Graph *graph);
+        unsigned int previousIndex(const unsigned int which) const;
+        unsigned int postIndex(const unsigned int which) const;
+        const std::queue<unsigned int> &getPreOrder() const;
+        const std::queue<unsigned int> &getPostOrder() const;
+    };
+
+    class TopologicalSort { };
 
     class StrongConnectedComponent : public ConnectedComponent { };
 
@@ -167,6 +189,7 @@ public:
     const DepthFirstPath depthFirstPathQ(const unsigned int from) const;
     const BreadthFirstPath breadthFirstPathQ(const unsigned int from) const;
     const Cycle cycleQ() const;
+    const DepthFirstOrder depthFirstOrderQ() const;
     const Path *connectQ(const unsigned int from) const;
 
     inline const unsigned int vertexN() const { return vertexN_; };

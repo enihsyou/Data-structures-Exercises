@@ -22,6 +22,7 @@ int main() {
     auto a  = g.depthFirstPathQ(0);
     auto b  = g.breadthFirstPathQ(0);
     auto c  = g.cycleQ().cycleQ();
+    auto d  = g.depthFirstOrderQ();
     std::cout << g << std::endl;
 
     return 0;

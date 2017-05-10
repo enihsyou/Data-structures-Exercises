@@ -76,6 +76,10 @@ const Graph::BreadthFirstPath Graph::breadthFirstPathQ(const unsigned int from) 
     return Graph::BreadthFirstPath(0, this);
 }
 
+const Graph::DepthFirstOrder Graph::depthFirstOrderQ() const {
+    return Graph::DepthFirstOrder(this);
+}
+
 const std::vector<unsigned int> AdjacentMatrixGraph::BFS(const unsigned int from) {
     validateVertex(from);
     std::vector<unsigned int> result;
@@ -260,4 +264,46 @@ void Graph::Cycle::dfs(const unsigned int vertex) {
 
 const std::stack<unsigned int> &Graph::Cycle::getCycle() const {
     return cycle;
+}
+
+Graph::DepthFirstOrder::DepthFirstOrder(const Graph *graph) : graph(graph),
+                                                              marked{std::vector<bool>(graph->vertexN_)},
+                                                              pre{std::vector<unsigned int>(graph->vertexN_)},
+                                                              post{std::vector<unsigned int>(graph->vertexN_)},
+                                                              preOrder{ },
+                                                              postOrder{ },
+                                                              preCounter{0},
+                                                              postCounter{0} {
+    for (unsigned int i = 0; i < graph->vertexN_; ++i) {
+        if (!marked[i]) dfs(i);
+    }
+}
+
+void Graph::DepthFirstOrder::dfs(const unsigned int vertex) {
+    marked[vertex] = true;
+    pre[vertex] = preCounter++;
+    preOrder.push(vertex);
+    for (auto &&item : graph->adjacent_[vertex]) {
+        if (!marked[item.to]) dfs(item.to);
+    }
+    postOrder.push(vertex);
+    post[vertex] = postCounter++;
+}
+
+const std::queue<unsigned int> &Graph::DepthFirstOrder::getPreOrder() const {
+    return preOrder;
+}
+
+const std::queue<unsigned int> &Graph::DepthFirstOrder::getPostOrder() const {
+    return postOrder;
+}
+
+unsigned int Graph::DepthFirstOrder::previousIndex(const unsigned int which) const {
+    graph->validateVertex(which);
+    return pre[which];
+}
+
+unsigned int Graph::DepthFirstOrder::postIndex(const unsigned int which) const {
+    graph->validateVertex(which);
+    return post[which];
 }
