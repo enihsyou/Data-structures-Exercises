@@ -16,6 +16,37 @@ std::ostream &operator<<(std::ostream &os, const Edge &edge) {
     return os;
 }
 
+unsigned int Edge::other(const unsigned int v) const {
+    if (v == from) return to;
+    if (v == to) return from;
+    throw std::runtime_error("not consistence");
+}
+
+bool Edge::operator<(const Edge &rhs) const {
+    return weight < rhs.weight;
+}
+
+bool Edge::operator>(const Edge &rhs) const {
+    return rhs < *this;
+}
+
+bool Edge::operator<=(const Edge &rhs) const {
+    return !(rhs < *this);
+}
+
+bool Edge::operator>=(const Edge &rhs) const {
+    return !(*this < rhs);
+}
+
+bool Edge::operator==(const Edge &rhs) const {
+    return std::tie(from, to, weight) == std::tie(rhs.from, rhs.to, rhs.weight);
+}
+
+bool Edge::operator!=(const Edge &rhs) const {
+    return !(rhs == *this);
+}
+
+
 const std::vector<unsigned int> AdjacentMatrixGraph::BFS(const unsigned int from) {
     validateVertex(from);
     std::vector<unsigned int> result;
@@ -220,6 +251,14 @@ const Graph::KosarajuSharirStrongConnectedComponent Graph::kosarajuSharirStrongC
     return Graph::KosarajuSharirStrongConnectedComponent(this);
 }
 
+const Graph::PrimMinimumSpanningTree Graph::primMinimumSpanningTree() const {
+    return Graph::PrimMinimumSpanningTree(this);
+}
+
+const Graph::KruskalMinimumSpanningTree Graph::kruskalMinimumSpanningTree() const {
+    return Graph::KruskalMinimumSpanningTree(this);
+}
+
 void Graph::DepthFirstPath::dfs(const unsigned int vertex) {
     marked_[vertex] = true;
     for (auto &&item : graph_->adjacent_[vertex]) {
@@ -415,6 +454,17 @@ unsigned int Graph::ConnectedComponent::count() const {
     return componentN_;
 }
 
+void Graph::ConnectedComponent::makeUnion(const unsigned int first, const unsigned int second) {
+    auto id1 = componentId(first), id2 = componentId(second);
+    if (id1 == id2) return;
+    for (auto &&item : componentId_) {
+        if (item == id2) item = id1;
+    }
+    idSize_[id1] += idSize_[id2];
+    idSize_[id2] = 0;
+    componentN_--;
+}
+
 bool Graph::ConnectedComponent::isConnected(const unsigned int first, const unsigned int second) {
     graph_->validateVertex(first);
     graph_->validateVertex(second);
@@ -452,6 +502,66 @@ Graph::KosarajuSharirStrongConnectedComponent::KosarajuSharirStrongConnectedComp
         if (!marked_[v]){
             dfs(v);
             componentN_++;
+        }
+    }
+}
+
+Graph::PrimMinimumSpanningTree::PrimMinimumSpanningTree(const Graph *graph)
+    : graph_(graph),
+      edgeTo_(std::vector<unsigned int>(graph->vertexN_)),
+      marked_(std::vector<bool>(graph->vertexN_)),
+      priorityQueue_(std::priority_queue<Edge, std::vector<Edge>, std::greater<Edge>>()) {
+    for (unsigned int i = 0; i < graph->vertexN_; ++i) {
+        if (!marked_[i]) prim(i);
+    }
+}
+
+void Graph::PrimMinimumSpanningTree::prim(unsigned int vertex) {
+    scan(vertex);
+    while (!priorityQueue_.empty()) {
+        auto e = priorityQueue_.top();
+        priorityQueue_.pop();
+        auto v = e.from, w = e.other(v);
+        if (marked_[v] && marked_[w]) continue;
+        mst_.push(e);
+        weight_ += e.weight;
+        if (!marked_[v]) scan(v);
+        if (!marked_[w]) scan(w);
+    }
+}
+
+void Graph::PrimMinimumSpanningTree::scan(unsigned int vertex) {
+    marked_[vertex] = true;
+    for (auto &&item : graph_->adjacent_[vertex]) {
+        if (!marked_[item.other(vertex)]) priorityQueue_.push(item);
+    }
+}
+
+double Graph::PrimMinimumSpanningTree::weight() const {
+    return weight_;
+}
+
+const std::queue<Edge> &Graph::PrimMinimumSpanningTree::mst() const {
+    return mst_;
+}
+
+Graph::KruskalMinimumSpanningTree::KruskalMinimumSpanningTree(const Graph *graph) : graph_(graph) {
+    std::priority_queue<Edge> priorityQueue_;
+    for (auto &&item : graph->adjacent_) {
+        for (auto &&item2 : item) {
+            priorityQueue_.push(item2);
+        }
+    }
+
+    ConnectedComponent cc = ConnectedComponent(graph_);
+    while (!priorityQueue_.empty() && mst_.size() < graph_->vertexN_ - 1) {
+        auto e = priorityQueue_.top();
+        auto v = e.from, w = e.other(v);
+        priorityQueue_.pop();
+        if (!cc.isConnected(v, w)) {
+            cc.makeUnion(v, w);
+            mst_.push(e);
+            weight_ += e.weight;
         }
     }
 }

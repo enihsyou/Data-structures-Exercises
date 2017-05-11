@@ -9,12 +9,20 @@
 
 
 struct Edge {
-    const unsigned int from;
-    const unsigned int to;
-    const double weight;
-
+    unsigned int from = 0U;
+    unsigned int to = 0U;
+    double weight = 0.0;
+    Edge() {};
     Edge(const unsigned int from, const unsigned int to, const double weight = default_value);
 
+//    Edge(const Edge & edge);
+    unsigned int other(const unsigned int v) const;
+    bool operator<(const Edge &rhs) const;
+    bool operator>(const Edge &rhs) const;
+    bool operator<=(const Edge &rhs) const;
+    bool operator>=(const Edge &rhs) const;
+    bool operator==(const Edge &rhs) const;
+    bool operator!=(const Edge &rhs) const;
     static double default_value;
 
     static void setDefault(const double new_default) { Edge::default_value = new_default; };
@@ -63,14 +71,6 @@ class Graph {
         FAIL
     };
 
-    class Connect {
-        const unsigned int from_;
-    public:
-        Connect(const unsigned int from);
-        bool marked(const unsigned int to);
-        unsigned int count(const unsigned int to);
-    };
-
     class Path {
     protected:
         const Graph *graph_;
@@ -110,6 +110,7 @@ class Graph {
         unsigned int componentId(const unsigned int which) const;
         unsigned int componentSize(const unsigned int which) const;
         unsigned int count() const;
+        void makeUnion(const unsigned int first, const unsigned int second);
         bool isConnected(const unsigned int first, const unsigned int second);
     };
 
@@ -166,13 +167,30 @@ class Graph {
         KosarajuSharirStrongConnectedComponent(const Graph *graph);
     };
 
-    class MinimumSpanningTree { };
+    class PrimMinimumSpanningTree {
+        const Graph *graph_;
+        double weight_;
+        std::vector<unsigned int> edgeTo_;
+        std::queue<Edge> mst_;
+        std::vector<bool> marked_;
+        std::priority_queue<Edge, std::vector<Edge>, std::greater<Edge>> priorityQueue_;
+    public:
+        PrimMinimumSpanningTree(const Graph *graph);
+        void prim(unsigned int vertex);
+        void scan(unsigned int vertex);
+        double weight() const;
+        const std::queue<Edge> &mst() const;
+    };
 
-    class PrimMinimumSpanningTree : public MinimumSpanningTree { };
+    class KruskalMinimumSpanningTree {
+        const Graph *graph_;
+        double weight_;
+        std::queue<Edge> mst_;
+    public:
+        KruskalMinimumSpanningTree(const Graph *graph);
+    };
 
-    class KruskalMinimumSpanningTree : public MinimumSpanningTree { };
-
-    class BoruvkaMinimumSpanningTree : public MinimumSpanningTree { };
+    class BoruvkaMinimumSpanningTree { };
 
     class ShortestPath { };
 
@@ -199,6 +217,8 @@ public:
     const Graph::ConnectedComponent connectedComponentQ() const;
     const Graph::TopologicalSort topologicalSort() const;
     const Graph::KosarajuSharirStrongConnectedComponent kosarajuSharirStrongConnectedComponent() const;
+    const Graph::PrimMinimumSpanningTree primMinimumSpanningTree() const;
+    const Graph::KruskalMinimumSpanningTree kruskalMinimumSpanningTree() const;
 //    const Path *connectQ(const unsigned int from) const;
 
     inline const unsigned int vertexN() const { return vertexN_; };
