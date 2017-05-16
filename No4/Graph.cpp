@@ -546,18 +546,18 @@ const std::queue<Edge> &Graph::PrimMinimumSpanningTree::mst() const {
 }
 
 Graph::KruskalMinimumSpanningTree::KruskalMinimumSpanningTree(const Graph *graph) : graph_(graph) {
-    std::priority_queue<Edge> priorityQueue_;
+    std::priority_queue<Edge, std::vector<Edge>, std::greater<Edge>> priority_queue;
     for (auto &&item : graph->adjacent_) {
         for (auto &&item2 : item) {
-            priorityQueue_.push(item2);
+            priority_queue.push(item2);
         }
     }
 
     ConnectedComponent cc = ConnectedComponent(graph_);
-    while (!priorityQueue_.empty() && mst_.size() < graph_->vertexN_ - 1) {
-        auto e = priorityQueue_.top();
+    while (!priority_queue.empty() && mst_.size() < graph_->vertexN_ - 1) {
+        auto e = priority_queue.top();
         auto v = e.from, w = e.other(v);
-        priorityQueue_.pop();
+        priority_queue.pop();
         if (!cc.isConnected(v, w)) {
             cc.makeUnion(v, w);
             mst_.push(e);
