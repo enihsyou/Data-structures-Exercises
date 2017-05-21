@@ -45,8 +45,8 @@ class AdjacentMatrixGraph {
     static const unsigned int PRINT_LENGTH_LIMIT = 78;
 
     const unsigned int vertexN_ = 0U;
-    unsigned int edgeN_ = 0U;
-    bool *adjacent_;
+    bool *adjacentMatrix_;
+    std::vector<std::set<unsigned int>> adjacentTable_;
 
     void validateVertex(const unsigned int v) const;
 public:
@@ -54,7 +54,8 @@ public:
     ~AdjacentMatrixGraph();
     void addBidirectedEdge(const unsigned int v, const unsigned int w);
     void addDirectedEdge(const unsigned int from, const unsigned int to);
-    const std::vector<std::vector<bool>> adjacentMatrix() const;
+    const std::vector<std::vector<bool>>adjacentMatrix() const;
+    const std::vector<std::set<unsigned int>> adjacentTable() const;
     void prettyPrintAdjacentMatrix(std::ostream &os) const;
     void prettyPrintAdjacentTable(std::ostream &os) const;
     const std::vector<unsigned int> BFS(const unsigned int from) const;
