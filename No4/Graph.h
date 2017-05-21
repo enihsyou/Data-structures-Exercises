@@ -51,13 +51,14 @@ class AdjacentMatrixGraph {
     void validateVertex(const unsigned int v) const;
 public:
     AdjacentMatrixGraph(const unsigned int vertexN);
+    ~AdjacentMatrixGraph();
     void addBidirectedEdge(const unsigned int v, const unsigned int w);
     void addDirectedEdge(const unsigned int from, const unsigned int to);
     const std::vector<std::vector<bool>> adjacentMatrix() const;
     void prettyPrintAdjacentMatrix(std::ostream &os) const;
     void prettyPrintAdjacentTable(std::ostream &os) const;
-    const std::vector<unsigned int> BFS(const unsigned int from);
-    const std::vector<unsigned int> DFS(const unsigned int from);
+    const std::vector<unsigned int> BFS(const unsigned int from) const;
+    const std::vector<unsigned int> DFS(const unsigned int from) const;
     friend std::ostream &operator<<(std::ostream &os, const AdjacentMatrixGraph &graph);
 };
 

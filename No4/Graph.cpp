@@ -118,7 +118,9 @@ AdjacentMatrixGraph::~AdjacentMatrixGraph() {
 }
 
 void AdjacentMatrixGraph::validateVertex(const unsigned int v) const {
-    if (v >= vertexN_) throw std::invalid_argument("Invalid");
+    if (v >= vertexN_)
+        throw std::invalid_argument(
+            "Invalid vertex index " + std::to_string(v) + " should range between 0 and " + std::to_string(vertexN_));
 }
 
 void AdjacentMatrixGraph::addBidirectedEdge(const unsigned int v, const unsigned int w) {
@@ -165,8 +167,12 @@ void AdjacentMatrixGraph::prettyPrintAdjacentMatrix(std::ostream &os) const {
 }
 
 void AdjacentMatrixGraph::prettyPrintAdjacentTable(std::ostream &os) const {
-    int number_length = std::max(2, static_cast<int>(std::to_string(vertexN_).length()));
+    if (vertexN_ > PRINT_LENGTH_LIMIT) {
+        os << vertexN_ << " too huge" << std::endl;
+        return;
+    }
 
+    int number_length = std::max(2, static_cast<int>(std::to_string(vertexN_).length()));
     for (int i = 0; i < vertexN_; ++i) {
         os << std::setw(number_length) << i << "-->";
         for (int j = 0; j < vertexN_; ++j) {
@@ -233,7 +239,9 @@ Graph::Graph(const unsigned int vertexN) : vertexN_{vertexN},
                                            adjacent_{std::vector<std::vector<Edge>>(vertexN)} { }
 
 void Graph::validateVertex(const unsigned int v) const {
-    if (v >= vertexN_) throw std::invalid_argument("Invalid");
+    if (v >= vertexN_)
+        throw std::invalid_argument(
+            "Invalid vertex index " + std::to_string(v) + " should range between 0 and " + std::to_string(vertexN_));
 }
 
 void Graph::addBidirectedEdge(const unsigned int from, const unsigned int to, const double weight) {

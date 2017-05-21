@@ -61,8 +61,7 @@ void graph_init(AdjacentMatrixGraph &graph) {
                         else if (method == "->")
                             graph.addDirectedEdge(static_cast<unsigned int>(std::stoi(first)),
                                                   static_cast<unsigned int>(std::stoi(second)));
-                        else { std::cerr << split_string << "未能识别，忽略" << std::endl; }
-                    } else { std::cerr << split_string << "未能识别，忽略" << std::endl; }
+                    } else { std::cerr << split_string << "数字范围不正确" << std::endl; }
                 } else if (token_match[8].length() && Is_number_in_limits(token_match.str(8))) {
                     print_vector(graph.BFS(static_cast<unsigned int>(std::stoi(token_match.str(8)))));
                 } else if (token_match[9].length() && Is_number_in_limits(token_match.str(9))) {
