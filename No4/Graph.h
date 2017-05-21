@@ -42,6 +42,8 @@ struct Edge {
 //};
 
 class AdjacentMatrixGraph {
+    static const unsigned int PRINT_LENGTH_LIMIT = 78;
+
     const unsigned int vertexN_ = 0U;
     unsigned int edgeN_ = 0U;
     bool *adjacent_;
@@ -49,7 +51,11 @@ class AdjacentMatrixGraph {
     void validateVertex(const unsigned int v) const;
 public:
     AdjacentMatrixGraph(const unsigned int vertexN);
-
+    void addBidirectedEdge(const unsigned int v, const unsigned int w);
+    void addDirectedEdge(const unsigned int from, const unsigned int to);
+    const std::vector<std::vector<bool>> adjacentMatrix() const;
+    void prettyPrintAdjacentMatrix(std::ostream &os) const;
+    void prettyPrintAdjacentTable(std::ostream &os) const;
     const std::vector<unsigned int> BFS(const unsigned int from);
     const std::vector<unsigned int> DFS(const unsigned int from);
     friend std::ostream &operator<<(std::ostream &os, const AdjacentMatrixGraph &graph);

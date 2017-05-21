@@ -2,6 +2,7 @@
 #include <stack>
 #include <iomanip>
 #include <algorithm>
+#include <iostream>
 #include "Graph.h"
 
 double Edge::default_value = 0.0;
@@ -49,13 +50,14 @@ bool Edge::operator!=(const Edge &rhs) const {
 
 const std::vector<unsigned int> AdjacentMatrixGraph::BFS(const unsigned int from) {
     validateVertex(from);
+
     std::vector<unsigned int> result;
-    std::queue<unsigned int> stack;
+    std::queue<unsigned int> queue;
     bool marked[vertexN_] = { };
-    stack.push(from);
-    while (!stack.empty()) {
-        unsigned int entry = stack.front();
-        stack.pop();
+    queue.push(from);
+    while (!queue.empty()) {
+        unsigned int entry = queue.front();
+        queue.pop();
         if (marked[entry]) continue;
         marked[entry] = true;
         result.push_back(entry);
@@ -63,7 +65,7 @@ const std::vector<unsigned int> AdjacentMatrixGraph::BFS(const unsigned int from
             if (marked[i]) continue;
             const unsigned int index = entry * vertexN_ + i;
             if (adjacent_[index])
-                stack.push(i);
+                queue.push(i);
         }
     }
 
@@ -83,11 +85,11 @@ const std::vector<unsigned int> AdjacentMatrixGraph::DFS(const unsigned int from
         if (marked[entry]) continue;
         marked[entry] = true;
         result.push_back(entry);
-        for (unsigned int i = 0U; i < vertexN_; ++i) {
+        for (int i = vertexN_ - 1; i >= 0; --i) {
             if (marked[i]) continue;
             const unsigned int index = entry * vertexN_ + i;
             if (adjacent_[index])
-                stack.push(i);
+                stack.push(static_cast<unsigned int>(i));
         }
     }
 
@@ -107,11 +109,67 @@ std::ostream &operator<<(std::ostream &os, const AdjacentMatrixGraph &graph) {
 
 AdjacentMatrixGraph::AdjacentMatrixGraph(const unsigned int vertexN)
     : vertexN_(vertexN),
-      adjacent_{new bool[vertexN]} { }
+      adjacent_{new bool[vertexN * vertexN]{ }} { }
 
 void AdjacentMatrixGraph::validateVertex(const unsigned int v) const {
     if (v >= vertexN_) throw std::invalid_argument("Invalid");
 }
+
+void AdjacentMatrixGraph::addBidirectedEdge(const unsigned int v, const unsigned int w) {
+    validateVertex(v);
+    validateVertex(w);
+    adjacent_[v * vertexN_ + w] = true;
+    adjacent_[w * vertexN_ + v] = true;
+}
+
+void AdjacentMatrixGraph::addDirectedEdge(const unsigned int from, const unsigned int to) {
+    validateVertex(from);
+    validateVertex(to);
+    adjacent_[from * vertexN_ + to] = true;
+}
+
+const std::vector<std::vector<bool>> AdjacentMatrixGraph::adjacentMatrix() const {
+    std::vector<std::vector<bool>> result;
+    for (int i = 0; i < vertexN_; ++i) {
+        result.push_back(std::vector<bool>(adjacent_ + i * vertexN_, adjacent_ + (i + 1) * vertexN_));
+    }
+    return result;
+}
+
+void AdjacentMatrixGraph::prettyPrintAdjacentMatrix(std::ostream &os) const {
+    if (vertexN_ > PRINT_LENGTH_LIMIT) {
+        os << vertexN_ << " too huge" << std::endl;
+        return;
+    }
+
+    int number_length = std::max(2, static_cast<int>(std::to_string(vertexN_).length()));
+    os << std::setw(number_length) << "╲";
+    for (int i = 0; i < vertexN_; i++) {
+        os << std::setw(number_length) << i;
+    }
+    os << std::endl;
+
+    for (int i = 0; i < vertexN_; ++i) {
+        os << std::setw(number_length) << i;
+        for (int j = 0; j < vertexN_; ++j) {
+            os << std::setw(number_length) << adjacent_[i * vertexN_ + j];
+        }
+        os << std::endl;
+    }
+}
+
+void AdjacentMatrixGraph::prettyPrintAdjacentTable(std::ostream &os) const {
+    int number_length = std::max(2, static_cast<int>(std::to_string(vertexN_).length()));
+
+    for (int i = 0; i < vertexN_; ++i) {
+        os << std::setw(number_length) << i << "-->";
+        for (int j = 0; j < vertexN_; ++j) {
+            if (adjacent_[i * vertexN_ + j]) os << std::setw(number_length) << j;
+        }
+        os << std::endl;
+    }
+}
+
 
 //const std::vector<unsigned int> Graph::BFS(const unsigned int source_) const {
 //    validateVertex(source_);
