@@ -2,8 +2,8 @@
 #include <stack>
 #include <iomanip>
 #include <algorithm>
-#include <iostream>
 #include "Graph.h"
+
 
 double Edge::default_value = 0.0;
 
@@ -48,7 +48,7 @@ bool Edge::operator!=(const Edge &rhs) const {
 }
 
 
-const std::vector<unsigned int> AdjacentMatrixGraph::BFS(const unsigned int from) {
+const std::vector<unsigned int> AdjacentMatrixGraph::BFS(const unsigned int from) const {
     validateVertex(from);
 
     std::vector<unsigned int> result;
@@ -59,6 +59,7 @@ const std::vector<unsigned int> AdjacentMatrixGraph::BFS(const unsigned int from
         unsigned int entry = queue.front();
         queue.pop();
         if (marked[entry]) continue;
+
         marked[entry] = true;
         result.push_back(entry);
         for (unsigned int i = 0U; i < vertexN_; ++i) {
@@ -72,7 +73,7 @@ const std::vector<unsigned int> AdjacentMatrixGraph::BFS(const unsigned int from
     return result;
 }
 
-const std::vector<unsigned int> AdjacentMatrixGraph::DFS(const unsigned int from) {
+const std::vector<unsigned int> AdjacentMatrixGraph::DFS(const unsigned int from) const {
     validateVertex(from);
 
     std::vector<unsigned int> result;
@@ -83,6 +84,7 @@ const std::vector<unsigned int> AdjacentMatrixGraph::DFS(const unsigned int from
         unsigned int entry = stack.top();
         stack.pop();
         if (marked[entry]) continue;
+
         marked[entry] = true;
         result.push_back(entry);
         for (int i = vertexN_ - 1; i >= 0; --i) {
@@ -110,6 +112,10 @@ std::ostream &operator<<(std::ostream &os, const AdjacentMatrixGraph &graph) {
 AdjacentMatrixGraph::AdjacentMatrixGraph(const unsigned int vertexN)
     : vertexN_(vertexN),
       adjacent_{new bool[vertexN * vertexN]{ }} { }
+
+AdjacentMatrixGraph::~AdjacentMatrixGraph() {
+    delete[](adjacent_);
+}
 
 void AdjacentMatrixGraph::validateVertex(const unsigned int v) const {
     if (v >= vertexN_) throw std::invalid_argument("Invalid");
@@ -220,6 +226,7 @@ void AdjacentMatrixGraph::prettyPrintAdjacentTable(std::ostream &os) const {
 //
 //    return result;
 //}
+
 Graph::Graph(const unsigned int vertexN) : vertexN_{vertexN},
                                            edgeN_{0U},
                                            inDegreeN_{std::vector<unsigned int>(vertexN)},
@@ -557,7 +564,7 @@ Graph::KosarajuSharirStrongConnectedComponent::KosarajuSharirStrongConnectedComp
     const Graph &graph1 = graph->reverse();
     DepthFirstOrder depthFirstOrder = DepthFirstOrder(&graph1);
     for (auto &&v : depthFirstOrder.reversePostOrder()) {
-        if (!marked_[v]){
+        if (!marked_[v]) {
             dfs(v);
             componentN_++;
         }
