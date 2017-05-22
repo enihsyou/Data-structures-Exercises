@@ -31,7 +31,7 @@ void g_Clean_input() {
     std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 }
 
-void graph_init(AdjacentMatrixGraph &graph) {
+void graph_func(AdjacentMatrixGraph &graph) {
     std::string input;
     g_Clean_input();
     std::cout << "->有向边；<->无向边；D深度优先；B广度优先\n"
@@ -78,7 +78,7 @@ int main() {
     unsigned int vec;
     std::cin >> vec;
     AdjacentMatrixGraph graph(vec);
-    graph_init(graph);
+    graph_func(graph);
 //    Graph g = Graph(8);
 //    g.addDirectedEdge(4, 5, 0.35);
 //    g.addDirectedEdge(5, 4, 0.35);

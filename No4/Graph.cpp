@@ -48,6 +48,34 @@ bool Edge::operator!=(const Edge &rhs) const {
 }
 
 
+AdjacentMatrixGraph::AdjacentMatrixGraph(const unsigned int vertexN)
+    : vertexN_(vertexN),
+      adjacentMatrix_{new bool[vertexN * vertexN]{ }},
+      adjacentTable_{std::vector<std::set<unsigned int>>(vertexN_)} { }
+
+void AdjacentMatrixGraph::validateVertex(const unsigned int v) const {
+    if (v >= vertexN_)
+        throw std::invalid_argument(
+            "Invalid vertex index " + std::to_string(v) + " should range between 0 and " + std::to_string(vertexN_));
+}
+
+void AdjacentMatrixGraph::addBidirectedEdge(const unsigned int v, const unsigned int w) {
+    validateVertex(v);
+    validateVertex(w);
+    adjacentMatrix_[v * vertexN_ + w] = true;
+    adjacentMatrix_[w * vertexN_ + v] = true;
+    adjacentTable_.at(v).insert(w);
+    adjacentTable_.at(w).insert(v);
+
+}
+
+void AdjacentMatrixGraph::addDirectedEdge(const unsigned int from, const unsigned int to) {
+    validateVertex(from);
+    validateVertex(to);
+    adjacentMatrix_[from * vertexN_ + to] = true;
+    adjacentTable_.at(from).insert(to);
+}
+
 const std::vector<unsigned int> AdjacentMatrixGraph::BFS(const unsigned int from) const {
     validateVertex(from);
 
@@ -98,59 +126,8 @@ const std::vector<unsigned int> AdjacentMatrixGraph::DFS(const unsigned int from
     return result;
 }
 
-std::ostream &operator<<(std::ostream &os, const AdjacentMatrixGraph &graph) {
-    bool *matrix = graph.adjacentMatrix_;
-    for (int i = 0; i < graph.vertexN_; ++i) {
-        for (int j = 0; j < graph.vertexN_; ++j) {
-            os << matrix[i * graph.vertexN_ + j] << " ";
-        }
-        os << std::endl;
-    }
-    return os;
-}
-
-AdjacentMatrixGraph::AdjacentMatrixGraph(const unsigned int vertexN)
-    : vertexN_(vertexN),
-      adjacentMatrix_{new bool[vertexN * vertexN]{ }},
-      adjacentTable_{std::vector<std::set<unsigned int>>(vertexN_)} { }
-
 AdjacentMatrixGraph::~AdjacentMatrixGraph() {
     delete[](adjacentMatrix_);
-}
-
-void AdjacentMatrixGraph::validateVertex(const unsigned int v) const {
-    if (v >= vertexN_)
-        throw std::invalid_argument(
-            "Invalid vertex index " + std::to_string(v) + " should range between 0 and " + std::to_string(vertexN_));
-}
-
-void AdjacentMatrixGraph::addBidirectedEdge(const unsigned int v, const unsigned int w) {
-    validateVertex(v);
-    validateVertex(w);
-    adjacentMatrix_[v * vertexN_ + w] = true;
-    adjacentMatrix_[w * vertexN_ + v] = true;
-    adjacentTable_.at(v).insert(w);
-    adjacentTable_.at(w).insert(v);
-
-}
-
-void AdjacentMatrixGraph::addDirectedEdge(const unsigned int from, const unsigned int to) {
-    validateVertex(from);
-    validateVertex(to);
-    adjacentMatrix_[from * vertexN_ + to] = true;
-    adjacentTable_.at(from).insert(to);
-}
-
-const std::vector<std::vector<bool>> AdjacentMatrixGraph::adjacentMatrix() const {
-    std::vector<std::vector<bool>> result;
-    for (int i = 0; i < vertexN_; ++i) {
-        result.push_back(std::vector<bool>(adjacentMatrix_ + i * vertexN_, adjacentMatrix_ + (i + 1) * vertexN_));
-    }
-    return result;
-}
-
-const std::vector<std::set<unsigned int>> AdjacentMatrixGraph::adjacentTable() const {
-    return adjacentTable_;
 }
 
 void AdjacentMatrixGraph::prettyPrintAdjacentMatrix(std::ostream &os) const {
@@ -189,6 +166,29 @@ void AdjacentMatrixGraph::prettyPrintAdjacentTable(std::ostream &os) const {
         }
         os << std::endl;
     }
+}
+
+const std::vector<std::vector<bool>> AdjacentMatrixGraph::adjacentMatrix() const {
+    std::vector<std::vector<bool>> result;
+    for (int i = 0; i < vertexN_; ++i) {
+        result.push_back(std::vector<bool>(adjacentMatrix_ + i * vertexN_, adjacentMatrix_ + (i + 1) * vertexN_));
+    }
+    return result;
+}
+
+const std::vector<std::set<unsigned int>> AdjacentMatrixGraph::adjacentTable() const {
+    return adjacentTable_;
+}
+
+std::ostream &operator<<(std::ostream &os, const AdjacentMatrixGraph &graph) {
+    bool *matrix = graph.adjacentMatrix_;
+    for (int i = 0; i < graph.vertexN_; ++i) {
+        for (int j = 0; j < graph.vertexN_; ++j) {
+            os << matrix[i * graph.vertexN_ + j] << " ";
+        }
+        os << std::endl;
+    }
+    return os;
 }
 
 
@@ -492,7 +492,7 @@ const std::vector<unsigned int> Graph::DepthFirstOrder::reversePostOrder() const
     std::vector<unsigned int> reversed_vector;
     std::queue<unsigned int> temp_queue = postOrder_;
     while (!temp_queue.empty()) {
-        reversed_vector.push_back(temp_queue.front());
+        reversed_vector.push_back((temp_queue.front()));
         temp_queue.pop();
     }
     std::reverse(reversed_vector.begin(), reversed_vector.end());
