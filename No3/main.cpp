@@ -97,12 +97,45 @@ void tree_func_4(BinaryTree &tree) {
     tree.levelOrderBFSTraverse(print);
     std::cout << std::endl;
 }
+
+void tree_func_5(BinaryTree &tree) {
+    std::string input;
+    g_Clean_input();
+    std::cout << "输入多组 '整数' 来构造键值对二叉树，以分隔符分离\n若存在相同键则删除，不存在则插入，'#'打印树，EOF标记或者'END'结束：\n";
+    std::regex delimiter_regex(R"([\s\|\\\/,;_]+)");
+    std::regex token_regex(R"((END)|(#)|(-?\d+))");
+    const std::string MAX_INT(std::to_string(std::numeric_limits<int>::max()));
+    const std::string MIN_INT(std::to_string(std::numeric_limits<int>::min()));
+    while (getline(std::cin, input)) {
+        auto token_iterator =
+            std::sregex_token_iterator(input.begin(), input.end(), delimiter_regex, -1);
+        while (token_iterator != std::sregex_token_iterator()) {
+            std::string split_string = token_iterator->str();
+            ++token_iterator;
+            if (split_string.empty()) continue;
+            std::smatch token_match;
+            if (regex_search(split_string, token_match, token_regex)) {
+                if (token_match[1].length()) { return; }
+                else if (token_match[2].length()) { tree.print(); }
+                else if (token_match[3].length()) {
+                    std::string first = token_match.str(3);
+                    if (Is_number_in_limits(first)) {
+                        int num = stoi(first);
+                        if (tree.contain(num)) tree.remove(num);
+                        else tree.put(num);
+                    } else { std::cerr << split_string << "超出表示范围，忽略" << std::endl; }
+                } else { std::cerr << split_string << "未能识别，忽略" << std::endl; }
+            } else { std::cerr << split_string << "未能识别，忽略" << std::endl; }
+        }
+    }
+}
 }
 
 //10:1;3:19 5:2 15:3 9:4,13:5|2:6 # !3 # 6:7 12:8 14:9 END
+//10 ;3 5 15 9,13|2 # 3 # 6 12 14 # 10 # END
 int main() {
     BinaryTree tree = BinaryTree();
-    tree_init(tree);
+//    tree_init(tree);
     //    tree.put(10, 12);
     //    tree.put(5, 10);
     //    tree.put(15, 15);
@@ -112,9 +145,10 @@ int main() {
     //    tree.put(6, 13);
     //    tree.put(12, 13);
     //    tree.put(14, 13);
-    tree_func_1(tree);
-    tree_func_2(tree);
-    tree_func_3(tree);
-    tree_func_4(tree);
+//    tree_func_1(tree);
+//    tree_func_2(tree);
+//    tree_func_3(tree);
+//    tree_func_4(tree);
+    tree_func_5(tree);
     return 0;
 }

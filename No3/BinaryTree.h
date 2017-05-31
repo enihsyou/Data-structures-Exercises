@@ -143,7 +143,7 @@ public:
      * \param value 对应键的要插入的值
      * \return 该键所在的节点
      */
-    const TreeNode &put(const int key, const int value);
+    const TreeNode &put(const int key, const int value = 0);
     /**
      * \brief 删除指定键的元素，操作之后依然保持二叉树性质，如果键不在树中，则抛出std::range_error
      * \param key 指定删除的键

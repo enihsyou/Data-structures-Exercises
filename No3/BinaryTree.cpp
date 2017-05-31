@@ -105,7 +105,8 @@ unsigned TreeNode::reSumSubSize() {
         + (right_ ? right_->reSumSubSize() : 0U) + 1;
 }
 
-std::string TreeNode::toString() const { return std::to_string(key_).append(":").append(std::to_string(value_)); }
+//std::string TreeNode::toString() const { return std::to_string(key_).append(":").append(std::to_string(value_)); }
+std::string TreeNode::toString() const { return std::to_string(key_); }
 
 AsciiNodePtr AsciiTree::buildTree(const BinaryTree &tree) {
     root_ = buildTreeRecursively(tree.root());
@@ -269,7 +270,7 @@ bool BinaryTree::contain(const int key) const noexcept {
         return true;
     }
     catch (std::range_error &error) {
-        std::cerr << error.what();
+//        std::cerr << error.what();
         return false;
     }
 }
