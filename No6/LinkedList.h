@@ -194,9 +194,11 @@ void LinkedList<T>::select_sort() {
             }
         }
         if (min == i) continue;
-        auto t = *(operator[](min));
-        remove(min);
-        insert(t.data(), i);
+        auto t = operator[](min), y = operator[](i);
+        insert(t->data(), i);
+        insert(y->data(), min + 1);
+        remove(i + 1);
+        remove(min + 1);
         print_content();
     }
 }
