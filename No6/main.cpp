@@ -4,7 +4,6 @@
 #include <random>
 #include "LinkedList.h"
 
-
 namespace {
 auto Is_number_in_limits = [](const std::string &a) -> bool {
     if (a.length() > 11) return false;
@@ -44,7 +43,6 @@ void insert_func() {
             if (regex_search(split_string, token_match, token_regex)) {
                 if (token_match[1].length()) {
                     std::string string = token_match.str(2);
-
                     linkedList.print();
                     std::cout << std::endl;
                     if (string == "I") linkedList.insert_sort();
