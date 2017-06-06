@@ -151,10 +151,12 @@ void LinkedList<T>::print_content() const {
 
 template<class T>
 LinkedList<T>::~LinkedList() {
-    while (start_) {
-        auto old_node = start_;
-        delete start_;
-        start_ = old_node;
+    while (size_) {
+        remove(0);
+        size_--;
+//        auto old_node = k
+//        delete start_;
+//        start_ = old_node;
     }
 }
 
